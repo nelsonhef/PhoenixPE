@@ -30,13 +30,13 @@
 
 [Main]
 Title=Notepad++
-Description=(v8.8.1) Notepad++ is a free and open source code editor and Notepad replacement that supports multiple languages.
+Description=(v8.8.1.0) Notepad++ is a free and open source code editor and Notepad replacement that supports multiple languages.
 Author=Homes32
 Level=5
 Selected=True
 Mandatory=False
-Version=1.4.11.0
-Date=2025-05-05
+Version=1.5.0.0
+Date=2025-03-07
 
 [Variables]
 %ProgramFolder%="Notepad++"
@@ -64,13 +64,16 @@ Decompress,"%ProgramsCache%\%ProgramFolder%\npp-%SourceArch%.7z","%TargetProgram
 
 Echo,"Configuring %ScriptTitle%..."
 
+RegLoadHives
+
 // Language (make sure this is configured before 'Minimal Install' Setting)
 FileCopy,"%TargetPrograms%\%ProgramFolder%\localization\%cmb_Language%.xml","%TargetPrograms%\%ProgramFolder%\nativeLang.xml"
 
 If,%cb_ReplaceNotepad%,Equal,True,Begin
-  RegHiveLoad,Tmp_Software,%RegSoftware%
-  RegWrite,HKLM,0x1,"Tmp_Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\notepad.exe","Debugger","#$q%PEPrograms%\%ProgramFolder%\%ProgramExe%#$q -notepadStyleCmdline -z"
-  RegHiveUnLoad,Tmp_Software
+  RegWrite,HKLM,REG_SZ,"Tmp_Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\notepad.exe","Debugger","#$q%PEPrograms%\%ProgramFolder%\%ProgramExe%#$q -notepadStyleCmdline -z"
+End
+Else,Begin
+  If,ExistRegValue,HKLM,"Tmp_Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\notepad.exe","Debugger",RegDelete,HKLM,"Tmp_Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\notepad.exe","Debugger"
 End
 
 If,%cb_MinimalInstall%,Equal,True,Begin
@@ -88,6 +91,10 @@ If,%cb_RegisterShellExt%,Equal,True,Run,%ScriptFile%,RegisterShellExtension
 // Register FileExt
 StrFormat,REPLACE,%txt_RegisterFileExt%,#$s,"",%txt_RegisterFileExt%
 ForEach,%Ext%,%txt_RegisterFileExt%,Delim=#$c,Associate,"%Ext%","%PEPrograms%\%ProgramFolder%\%ProgramExe%"
+// Causes "Class not registered" error in some Win10 builds.
+If,ExistRegValue,HKLM,"Tmp_Software\Classes\xmlfile\shell\Open\command","DelegateExecute",RegDelete,HKLM,"Tmp_Software\Classes\xmlfile\shell\Open\command","DelegateExecute"
+
+RegUnloadHives
 
 Echo,"Configuring %ScriptTitle%..."
 
@@ -196,8 +203,8 @@ End
 ///////////////////////////////////////////////////////////////////////////////////
 // Shortcuts
 
-If,%cb_DesktopShc%,Equal,True,AddShortcut,Desktop,,%txt_ShortcutName%,"%PEPrograms%\%ProgramFolder%\%ProgramExe%"
-If,%cb_StartMenuShc%,Equal,True,AddShortcut,StartMenu,%txt_StartMenuFolder%,%txt_ShortcutName%,"%PEPrograms%\%ProgramFolder%\%ProgramExe%"
+If,%cb_DesktopShc%,Equal,True,AddShortcut,Desktop,"",%txt_ShortcutName%,"%PEPrograms%\%ProgramFolder%\%ProgramExe%","","%PEPrograms%\%ProgramFolder%"
+If,%cb_StartMenuShc%,Equal,True,AddShortcut,StartMenu,%txt_StartMenuFolder%,%txt_ShortcutName%,"%PEPrograms%\%ProgramFolder%\%ProgramExe%","","%PEPrograms%\%ProgramFolder%"
 If,%cb_PinToTaskbar%,Equal,True,PinShortcut,Taskbar,Auto,"%PEPrograms%\%ProgramFolder%\%ProgramExe%"
 If,%cb_PinToStartMenu%,Equal,True,PinShortcut,StartMenu,Auto,"%PEPrograms%\%ProgramFolder%\%ProgramExe%"
 
@@ -209,7 +216,8 @@ If,%cb_PinToStartMenu%,Equal,True,PinShortcut,StartMenu,Auto,"%PEPrograms%\%Prog
 // Parameters.....: 
 // Return values..: 
 // Author.........: Homes32
-// Remarks........: NppShell_06.dll included with this script has been recompiled from source with the /MT switch. This makes it
+// Remarks........: RegHives must be loaded.
+//                  NppShell_06.dll included with this script has been recompiled from source with the /MT switch. This makes it
 //                  slightly less memory efficient as far as shell extensions go, but we don't have to worry about making sure the
 //                  user selects the correct VC++ runtime component when they build the project.
 // Related........: 
@@ -218,18 +226,16 @@ If,%cb_PinToStartMenu%,Equal,True,PinShortcut,StartMenu,Auto,"%PEPrograms%\%Prog
 If,%txt_ShellContextMenuTxt%,Equal,"",WriteInterface,Value,%ScriptFile%,Interface,txt_ShellContextMenuTxt,"Edit with &Notepad++"
 
 ExtractFile,%ScriptFile%,%SourceArch%,"%ShellExtDll%","%TargetPrograms%\%ProgramFolder%"
-RegHiveLoad,Tmp_Software,%RegSoftware%
-RegWrite,HKLM,0x1,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}","","Notepad++"
-RegWrite,HKLM,0x1,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\InprocServer32","","%PEPrograms%\%ProgramFolder%\%ShellExtDll%"
-RegWrite,HKLM,0x1,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\InprocServer32","ThreadingModel","Apartment"
-RegWrite,HKLM,0x1,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings","Custom",""
-RegWrite,HKLM,0x4,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings","Dynamic",1
-RegWrite,HKLM,0x4,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings","Maxtext",25
-RegWrite,HKLM,0x1,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings","Path","%PEPrograms%\%ProgramFolder%\%ProgramExe%"
-RegWrite,HKLM,0x4,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings","ShowIcon",1
-RegWrite,HKLM,0x1,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings","Title","%txt_ShellContextMenuTxt%"
-RegWrite,HKLM,0x1,"Tmp_Software\Classes\*\shellex\ContextMenuHandlers\Notepad++","","{B298D29A-A6ED-11DE-BA8C-A68E55D89593}"
-RegHiveUnLoad,Tmp_Software
+RegWrite,HKLM,REG_SZ,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}","","Notepad++"
+RegWrite,HKLM,REG_SZ,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\InprocServer32","","%PEPrograms%\%ProgramFolder%\%ShellExtDll%"
+RegWrite,HKLM,REG_SZ,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\InprocServer32","ThreadingModel","Apartment"
+RegWrite,HKLM,REG_SZ,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings","Custom",""
+RegWrite,HKLM,REG_DWORD,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings","Dynamic",1
+RegWrite,HKLM,REG_DWORD,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings","Maxtext",25
+RegWrite,HKLM,REG_SZ,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings","Path","%PEPrograms%\%ProgramFolder%\%ProgramExe%"
+RegWrite,HKLM,REG_DWORD,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings","ShowIcon",1
+RegWrite,HKLM,REG_SZ,"Tmp_Software\Classes\CLSID\{B298D29A-A6ED-11DE-BA8C-A68E55D89593}\Settings","Title","%txt_ShellContextMenuTxt%"
+RegWrite,HKLM,REG_SZ,"Tmp_Software\Classes\*\shellex\ContextMenuHandlers\Notepad++","","{B298D29A-A6ED-11DE-BA8C-A68E55D89593}"
 
 [#DownloadProgram#]
 // ===============================================================================================================================
@@ -407,7 +413,7 @@ btn_SetDefaultOptions=,1,8,541,5,25,25,SetDefaultOptions,SetDefaults_16.png,True
 btn_AdvancedOptions=,1,8,571,5,25,25,ToggleAdvancedOptions,Advanced_16.png,True,"__Show Advanced Options"
 btn_ScriptInfo=,1,8,601,5,25,25,ShowScriptInfo,Help_16.png,True,"__Script Info"
 bvl_RunFromRam=bvl_RunFromRam,1,12,5,50,133,25
-cb_RunFromRam="Run From RAM",1,3,12,54,100,18,False,"__When this option is enabled the program files will be stored in Boot.wim and loaded into memory on boot.#$x#$xYou should only select this option if you are booting from Read-Only media and your program requires write-access to the file system."
+cb_RunFromRam="Run From RAM",1,3,12,54,100,18,True,"__When this option is enabled the program files will be stored in Boot.wim and loaded into memory on boot.#$x#$xYou should only select this option if you are booting from Read-Only media and your program requires write-access to the file system."
 bvl_Shortcuts=Shortcuts,1,12,5,90,133,184,8,Bold
 cb_DesktopShc=Desktop,1,3,12,104,122,18,False
 cb_StartMenuShc="Start Menu",1,3,12,123,122,18,True
