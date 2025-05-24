@@ -1,0 +1,215 @@
+[License]
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// This script is part of the PhoenixPE project and distributed under the MIT License.
+//
+// Additional 3rd party tools, encoded files, and programs used by the project are the property
+// of their respective authors and may be subject to their own license agreement.
+//
+// Copyright (c) 2025 Nelson K. Hennemann F. (nelsonhef)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+[Main]
+Title=USB Device Tree Viewer
+Author=Nelson K. Hennemann F. (nelsonhef)
+Level=5
+Version=1.0.0.0
+Description=The USB Device Tree Viewer, short UsbTreeView is based upon the Microsoft #$qUSBView#$q sample application found in the Windows Driver Development Kits developed by Uwe Sieber
+Date=2025-05-23
+Selected=True
+Mandatory=False
+
+[Variables]
+%ProgramFolder%="USBDeviceTreeViewer"
+%ProgramExex86%="USBTreeView.exe"
+%ProgramExex64%="USBTreeView.exe"
+%DownloadURLx32%=https://www.uwe-sieber.de/files/UsbTreeView_Win32.zip
+%DownloadURLx64%=https://www.uwe-sieber.de/files/UsbTreeView_x64.zip
+%SetupFile%="USBTreeView.zip"
+
+[Process]
+Echo,"Processing %ScriptTitle%..."
+
+If,%cb_RunFromRam%,Equal,True,RunFromRam
+Run,%ScriptFile%,SetProgramArch
+
+///////////////////////////////////////////////////////////////////////////////////
+// Extract
+
+If,%cb_AlwaysDownload%,Equal,True,DirDeleteEx,"%ProgramsCache%\%ProgramFolder%"
+If,Not,ExistFile,"%ProgramsCache%\%ProgramFolder%\%SetupFile%",Run,%ScriptFile%,DownloadProgram
+Run,%ScriptFile%,ExtractProgram,"%TargetPrograms%\%ProgramFolder%"
+
+///////////////////////////////////////////////////////////////////////////////////
+// Shortcuts
+
+If,%cb_DesktopShc%,Equal,True,AddShortcut,Desktop,,%txt_ShortcutName%,"%PEPrograms%\%ProgramFolder%\%ProgramExe%"
+If,%cb_StartMenuShc%,Equal,True,AddShortcut,StartMenu,%txt_StartMenuFolder%,%txt_ShortcutName%,"%PEPrograms%\%ProgramFolder%\%ProgramExe%"
+If,%cb_PinToTaskbar%,Equal,True,PinShortcut,Taskbar,Auto,"%PEPrograms%\%ProgramFolder%\%ProgramExe%"
+If,%cb_PinToStartMenu%,Equal,True,PinShortcut,StartMenu,Auto,"%PEPrograms%\%ProgramFolder%\%ProgramExe%"
+
+[#ExtractProgram#]
+// ===============================================================================================================================
+// Name...........: ExtractProgram
+// Description....: Extract program files from script/setup files.
+// Syntax.........: Run,%ScriptFile%,ExtractProgram,<DestDir>
+// Parameters.....: #1 DestDir - The directory where the files will be extracted.
+// Return values..: 
+// Author.........: Homes32
+// Remarks........:
+// Related........: 
+// ===============================================================================================================================
+[ExtractProgram]
+Echo,"Extracting files..."
+7z,"e -y #$q%ProgramsCache%\%ProgramFolder%\%SetupFile%#$q -o#$q#1#$q"
+If,Not,#r,Equal,0,Halt,"Error: Failed to extract [%SetupFile%]."
+
+[#DownloadProgram#]
+// ===============================================================================================================================
+// Name...........: DownloadProgram
+// Description....: Download the program files from the author's website.
+// Syntax.........: Run,%ScriptFile%,DownloadProgram
+// Parameters.....: 
+// Return values..: 
+// Author.........: Homes32
+// Remarks........:
+// Related........: 
+// ===============================================================================================================================
+[DownloadProgram]
+Echo,"Downloading %ScriptTitle%..."
+Run,%ScriptFile%,SetProgramArch
+WebGet,%DownloadURL%,"%ProgramsCache%\%ProgramFolder%\%SetupFile%",NOERR
+If,Not,#r,Equal,200,Halt,"Download failed: The code returned was [#r]."
+  
+[#SetProgramArch#]
+// ===============================================================================================================================
+// Name...........: SetProgramArch
+// Description....: Configure the script for the correct source architecture.
+// Syntax.........: Run,%ScriptFile%,SetProgramArch
+// Parameters.....: 
+// Return values..: Sets the following local variables:
+//                  %DownloadURL%    - The x86 or x64 download URL for %SetupFile%.
+//                  %ProgramExe%     - The x86 or x64 program name.
+// Author.........: Homes32
+// Remarks........:
+// Related........: 
+// ===============================================================================================================================
+[SetProgramArch]
+If,%SourceArch%,Equal,x64,Begin
+  Set,%DownloadURL%,%DownloadURLx64%
+  Set,%ProgramExe%,%ProgramExex64%
+End  
+Else,Begin
+  Set,%DownloadURL%,%DownloadURLx86%
+  Set,%ProgramExe%,%ProgramExex86%
+End
+
+[#ClearDownloadCache#]
+// ===============================================================================================================================
+// Name...........: ClearDownloadCache
+// Description....: Remove all downloaded setup and program files.
+// Syntax.........: Run,%ScriptFile%,ClearDownloadCache
+// Parameters.....: 
+// Return values..: 
+// Author.........: Homes32
+// Remarks........:
+// Related........: btn_PurgeCache
+// ===============================================================================================================================
+[ClearDownloadCache]
+DirDeleteEx,"%ProgramsCache%\%ProgramFolder%"
+
+[#SetDefaultOptions#]
+// ===============================================================================================================================
+// Name...........: SetDefaultOptions
+// Description....: Sets script options to default values.
+// Syntax.........: 
+// Parameters.....: 
+// Return values..: 
+// Author.........: Homes32
+// Remarks........: Called by btn_SetDefaultOptions
+// Related........: 
+// ===============================================================================================================================
+[SetDefaultOptions]
+System,Cursor,Wait
+WriteInterface,Value,%ScriptFile%,Interface,cb_RunFromRam,False
+WriteInterface,Value,%ScriptFile%,Interface,cb_AlwaysDownload,False
+WriteInterface,Value,%ScriptFile%,Interface,cb_DesktopShc,False
+WriteInterface,Value,%ScriptFile%,Interface,cb_StartMenuShc,True
+WriteInterface,Value,%ScriptFile%,Interface,cb_PinToTaskbar,False
+WriteInterface,Value,%ScriptFile%,Interface,cb_PinToStartMenu,False
+WriteInterface,Value,%ScriptFile%,Interface,txt_StartMenuFolder,"System Information"
+WriteInterface,Value,%ScriptFile%,Interface,txt_ShortcutName,"USB Device Tree Viewer"
+System,Cursor,Normal
+
+[#Interface#]
+// ===============================================================================================================================
+// Name...........: Interface
+// Description....: 
+// Syntax.........: 
+// Parameters.....: 
+// Return values..: 
+// Author.........: Homes32, nelsonhef
+// Remarks........:
+// Related........:
+// ===============================================================================================================================
+[Interface]
+bvl_Homepage=bvl_Homepage,1,12,367,5,72,25
+web_Homepage=Homepage,1,10,377,9,60,18,https://www.uwe-sieber.de/
+btn_DownloadProgram=,1,8,448,5,25,25,DownloadProgram,VistalcoDownload_16.png,False,"__Download the program."
+btn_PurgeCache=,1,8,479,5,25,25,ClearDownloadCache,Trash.ico,True,"__Remove all downloaded setup files."
+btn_SetDefaultOptions=,1,8,541,5,25,25,SetDefaultOptions,SetDefaults_16.png,True,"__Restore Defaults"
+bvl_RunFromRam=bvl_RunFromRam,1,12,5,50,133,25
+cb_RunFromRam="Run From RAM",1,3,12,54,100,18,False,"__When this option is enabled the program files will be stored in Boot.wim and loaded into memory on boot.#$x#$xYou should only select this option if you are booting from Read-Only media and your program requires write-access to the file system."
+cb_AlwaysDownload="Always download latest version",1,3,155,54,177,18,False,"__Enable this option to ensure you always included the latest version in your build."
+bvl_Shortcuts=Shortcuts,1,12,5,90,133,184,8,Bold
+cb_DesktopShc=Desktop,1,3,12,104,122,18,False
+cb_StartMenuShc="Start Menu",1,3,12,123,122,18,True
+cb_PinToTaskbar="Pin to Taskbar",1,3,12,142,122,18,False
+cb_PinToStartMenu="Pin to Start Menu",1,3,12,161,122,18,False
+txt_StartMenuFolder="Start Menu folder:",1,0,12,201,119,21,"System Information"
+txt_ShortcutName="Shortcut Name:",1,0,12,243,119,21,"USB Device Tree Viewer"
+
+[InterfaceEncoded]
+Trash.ico=1150,1212
+SetDefaults_16.png=2475,3404
+VistalcoDownload_16.png=927,1348
+
+[AuthorEncoded]
+Icon1.png=3060,4172
+Logo=Icon1.png
+
+[EncodedFile-InterfaceEncoded-Trash.ico]
+lines=0
+0=eJx10/1PEnEcB/DzYT2s7GHNHpYrY2221dbjVlsPs9asNVdtPfsHNEtt+ZRsyXjyNAFBHgQjKQi0YEIiBmJmoM5MwTISrOzB0jSndRToYctPd7Yro/re3vfD9+51973P53sIEkEcixYhxDkeSY1GkKUIgqwjQkwRMz/nyZEYjfw1Dh08MGff3sSYlDOndyQkJAiIyIko/hM5jUbjxsWtXL5t65b5R48cnkU+o1wiijx54jjb5eoEj8cDvT4f4DgOg4ODYLXWQUWFEszmGnj6tBtkMhnQ4uOXZV9Ii5i5DpTFyFKpVFMajQa0Wi1YLBYwGAwgkYgBRQugtFQEarUaOGxWIHHXzsXh36EuZpx67+vGxj68w0IT41goFMI+j41ifZ4n/h5XO9bV0jQdvbT4MW31qiXh3iTnn6d8T2NtsFHKDnVZTcG7gsu4hUfHOx/Yp71NI38VHRm5NNzfEjDyST/U1+u3C/NDtuKcSVetPlgvZOBmNCvUqCkPkP7+7RsDC+bNXRPuDWKuiPQ9TdavzUoejo2M+Mn1v3rWjTVXKoPmwks46R2mqqHYhTEbw3217IqG9B57TcBemP6NWMcX0r/xPcNqWecnbSLmBOlb64wfaSti91wVFP5R/3taeR3ph1+/wF4+dAbc+oqJkcEBrNOkCzq15cF2W42f9O0NltENa+KS5byCP7zluqSNqt/rR86Ag5/5zV1TOd6Apk/aRQycqr/L0fBpx/q1KWU8NJKyrfW1Ea13tL2Ux8cD2AuHNeg26cbbNJKJ7pYmP+XdzfexpO2bzmWnpUZRXlcmnNNpqx74V//7+55jM/tP5tj+3fnJB5NmU76Qw0rj83lTErEYhCUloFQqp/egQqEADocDubk5QKfToaioCMTEPedSU8cOHUiaR3leEcro6HgEPq8XHne5YXh4CIj3Q39/P9TX20ClugY6nRaczU7wenuIf0D6PetC+q+/UaVUbMjIyLgnlUqnyH1ebdCDvqoSblXqpve+Ql4GIqEQTEYjCPh8yM3JloX3nxzE2jfT8/K4N9XqD1U6nYfPK85mMpk3Mi9ezEMLCoxcDvssyuXGhzsW0UlH1D8S8Tus8BDX3xIV/AEUry6xeJzjDClKLM7Qy0zOZxgFIxDUsUBoV2bs8iFCkXoMbAB8oQUybAHR5gEAAAACAAAAJAAAAEUDAAAAAAAAAQAAAAAAAAAAAAAA
+
+[EncodedFile-InterfaceEncoded-SetDefaults_16.png]
+lines=0
+0=iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAHEGlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDggNzkuMTY0MDM2LCAyMDE5LzA4LzEzLTAxOjA2OjU3ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDE5LTEwLTIxVDE3OjIxOjEyLTA1OjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAxOS0xMi0wMlQyMTo1MTo1Mi0wNjowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOS0xMi0wMlQyMTo1MTo1Mi0wNjowMCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiIHBob3Rvc2hvcDpJQ0NQcm9maWxlPSJzUkdCIElFQzYxOTY2LTIuMSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpiMWM3ZDhlNS1mMGMxLTMwNDgtOGNiOS03YWU4YjgyNDgyNmQiIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDowNzhkNDM1MC04NWRmLTg4NDQtOTY0Mi1lYTIxNmU3YjUwNDIiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDpmMDM1MDg3Mi1hYmUxLWU5NDAtOTE2NC1kYzRjMzdjOGIwOTUiPiA8ZGM6Y3JlYXRvcj4gPHJkZjpTZXE+IDxyZGY6bGk+SG9tZXMzMjwvcmRmOmxpPiA8L3JkZjpTZXE+IDwvZGM6Y3JlYXRvcj4gPHhtcE1NOkhpc3Rvcnk+IDxyZGY6U2VxPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY3JlYXRlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpmMDM1MDg3Mi1hYmUxLWU5NDAtOTE2NC1kYzRjMzdjOGIwOTUiIHN0RXZ0OndoZW49IjIwMTktMTAtMjFUMTc6MjE6MTItMDU6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAyMDE5IChXaW5kb3dzKSIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MDdmNDNiMDctMTg1NC1hNjQwLWEwM2UtYTQxMTM2YTA0ODA2IiBzdEV2dDp3aGVuPSIyMDE5LTEwLTIxVDE3OjIxOjQ3LTA1OjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOSAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOmIxYzdkOGU1LWYwYzEtMzA0OC04Y2I5LTdhZThiODI0ODI2ZCIgc3RFdnQ6d2hlbj0iMjAxOS0xMi0wMlQyMTo1MTo1Mi0wNjowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIxLjAgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDwvcmRmOlNlcT4gPC94bXBNTTpIaXN0b3J5PiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PlYy9voAAAJBSURBVDiNpdHLThNRHAbwvkCjpalcSyyUEDo09Jw5MxZeggXdQHSpa96ARTclolWpLYtG20IDwdpaoeVOW63G0gvEmEaj3cFKYrxMXLjw88wAbQ3smOQ3OTn/73yZiw6A7jK0G9tjJ0rcPmtnB8zNFbnjU0VtT52VWD1/UcE4KzOFw39K3D6D44NDYRWeOVdQYKoxDue8YxjeH4b1lRXm5S70v+7HSHlkjO83FeSZkcNFnAUnDFsGuOIu7L0v4M7GbXRlusDeMGO9QMyIHikrYSA7ACEnQF2LuyLkrIzuTDd6Q704rB1CvabWp6B/qYeYFT31AmlTqtrX7XAmb2AwLsCyZoFz2wn7th2GqAHxfEI7nM6voW2+DY4dB8QNsVovsKVsCl2myOXyGrpA0LHSAWOsBZOxSeAL8LH0GWJYRGeyE/KqDHFFVOoFQkJQBucFpFNb+JH/gxeJFMx+M4SADW/TZdR2jnAzdAtXo1cgJ2XQ51TVKGBLrGqJXofkl7C5uotvld9YiC/hSSyCr8VfmF6cQcucAUPPhkAX6ZnGK9Aw9UhRCdeCJhAvQblwAPzkk+9ApXgA6z0rLGELWISBRuiZxkckQWLkIIUkGH1G9Ln7UPtUA/4Co75R6O/rIT2VoGaaNH4jmSM6EiAu4ieQgzJava2QZ2RMBCZgvmsGDVLweTOXeqZR8Jic8JFx8ogosl9Gj7cHpmkTqJ8/7iwvmCUqRcuc5i8q0JGHpJ08IG6uyB1rvNrarc18RHeu4DL+AeXUQV071uymAAAAAElFTkSuQmCCeJwTCk4tcUlNSyzNKSmONzTTK8hLZxgFIwes5sQv/03zkSgjAwBGXgl7UO9x9wEAAAACAAAAKgAAAKsJAAAAAAAAAQAAAAAAAAAAAAAA
+
+[EncodedFile-InterfaceEncoded-VistalcoDownload_16.png]
+lines=0
+0=iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADZklEQVQ4jUWT3WubdRTHP89L3p8mTfpim7ZL37ZZp6UTV1F0g00dXky9myAiXhf8A0QRvFCGF96o4IViJ0Mm4lSUIbIqdVs6W+3W1da+LW3SpC9Jm6TJ8+RJ+uT5SdLBDpzD4cD3e76Hc470zIUTHJiMU4szP3Yav+stXr00PVQqNL4SG1ea/ltYW29wp8Y2/roxuTF2CzOhANU6StVLe/VEkqBg5sHv8vf2D38b+Hv4bJdS5chRgcdUuZ28hud4elr+ff1lSCbud0UtapkaHCFnMLNPhc8+/8XsyEsEIxK4VYVCBXo98PP8Ga7eOnbc8l2/pzg/HHD1xJaNhSxq/+N9gI1pO/CrI9+c7yM46AMnIGqDqTCgQjoCi3EX0ptBVaRPfR/76Z/BuoL9vIGo6pjejhcOO7wnxVacsd0k4YYAgz2P4LEhU3PHCk88d4Ngbpu07H4sfT1y3mTtspqYy2OXDfTW1tOPhsfJKVPMbW7QUI4Q7nqPlKgwkbvJkrFNceMQvt4Z8EPjcNuZTHTtslpKeqESIG/FO2NCojtwglTvDI41ia/iP5DyXqNs5PFrTSwsj5CdPYe76Qr5lcZwfYT8TQ+KpWNFAtmELfGj8TUxLUdDeYaN6hKhUBiqMgV1hsaBL1m68ixWIUOlulhfn6IdbaVcbqN8+x2s0OJrpcN3kHRw52t1F3ljmb29KusJnYr0L67QFLolMKaXPy8nzEm19ekZ2WpWPFu/Vv5wO1djzYfoqcjgmHuIwuIHbGkfoYWmEXYDOztFKGqUk3rJuJO9VFdguhGyJd7vPJe46n+4YPs68HqCkDO20AJRukIa89FtbKuCpNrsb/vIfLf1hlXMT9UJnL1QXCLqj8ivt58S7e2tENLADkK3v8zUxR2yq1k8ARV5p43cpPPdStb3mRLqROgpVFcASXFhbE+IC76I8qnvySpeDY41aUx+coS9TRdDJ1swkyqbt/QdW6/OSk1VkOSDUxZVhOIkZGaFvjshVoVX7u4fcpP8s2Iu3M381tf34oqc6rJ25+Y3S/vpFcknTUv79sHz1Ajq0WbX6WfU3LOFdU8dLewL7o5XPqYl/vZc9Beqqx0QEjg0LzIC6T74AYF0QFjc5KJtWslk1Oos5Rn1toDd7MDINSK7aydvI+QHYID/Ab48jqdfCQxIAAAAAElFTkSuQmCCeJwTD8ssLknMSc53yS/Py8lPTIk3NNMryEtnGAUjAsxnxi+fwnL8OSMDAKdDC4fwuePJAQAAAAIAAAAvAAAAnwMAAAAAAAABAAAAAAAAAAAAAAA
+
+[EncodedFile-AuthorEncoded-Icon1.png]
+lines=1
+0=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
+1=PUK8hLZxgFIxB84cYvn1Tp9JuRAQAGygZPJoXn9gEAAAACAAAAIQAAAPQLAAAAAAAAAQAAAAAAAAAAAAAA
