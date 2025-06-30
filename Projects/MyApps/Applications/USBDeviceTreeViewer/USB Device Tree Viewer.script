@@ -34,7 +34,7 @@ Author=Nelson K. Hennemann F. (nelsonhef)
 Level=5
 Version=1.0.0.0
 Description=The USB Device Tree Viewer, short UsbTreeView is based upon the Microsoft #$qUSBView#$q sample application found in the Windows Driver Development Kits developed by Uwe Sieber
-Date=2025-05-23
+Date=2025-06-30
 Selected=True
 Mandatory=False
 
