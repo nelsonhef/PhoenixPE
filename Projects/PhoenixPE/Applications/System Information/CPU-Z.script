@@ -30,18 +30,18 @@
 
 [Main]
 Title=CPU-Z
-Description=(v2.17.0) CPU-Z is a freeware system profiling and monitoring application.
+Description=(v2.20.1) CPU-Z is a freeware system profiling and monitoring application.
 Author=Homes32
 Level=5
 Selected=True
 Mandatory=False
 Version=1.0.14.0
-Date=2025-10-14
+Date=2026-05-28
 
 [Variables]
 %ProgramFolder%="CPU-Z"
 %ProgramExe%="cpuz_x32.exe"
-%ProgramVersion%=2.17
+%ProgramVersion%=2.20.1
 %DownloadURL%=http://download.cpuid.com/cpu-z/cpu-z_%ProgramVersion%-en.zip
 %DownloadURL-cn%=http://download.cpuid.com/cpu-z/cpu-z_%ProgramVersion%-cn.zip
 %SetupFile%="cpu-z-en.zip"
