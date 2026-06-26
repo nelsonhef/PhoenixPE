@@ -30,18 +30,18 @@
 
 [Main]
 Title=.NET 9
-Description=(v9.0.14) .NET 9 is a cross-platform software development framework for building and running applications.
+Description=(v9.0.17) .NET 9 is a cross-platform software development framework for building and running applications.
 Selected=False
 Level=4
 Author=Homes32
 Version=1.0.9.0
-Date=2026-03-26
+Date=2026-06-25
 Mandatory=False
 
 [Variables]
 %ProgramTitle%=".NET 9 Desktop Runtime"
 %ProgramFolder%="dotnet"
-%ProgramVersion%="9.0.14"
+%ProgramVersion%="9.0.17"
 %DownloadURLx86%=https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/%ProgramVersion%/windowsdesktop-runtime-%ProgramVersion%-win-x86.exe
 %DownloadURLx64%=https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/%ProgramVersion%/windowsdesktop-runtime-%ProgramVersion%-win-x64.exe
 
@@ -55,10 +55,10 @@ If,Not,ExistFile,"%ProgramsCache%\%ProgramFolder%\desktop-runtime-%ProgramVersio
 // Extract Files
 Echo,"Extracting files..."
 WixExtract,"%ProgramsCache%\%ProgramFolder%\desktop-runtime-%ProgramVersion%-%SourceArch%.exe","%ProjectTemp%\%ProgramFolder%\%ProgramVersion%"
-MSIExtract,"%ProjectTemp%\%ProgramFolder%\%ProgramVersion%\AttachedContainer\dotnet-host-%ProgramVersion%-win-%SourceArch%.msi","%ProjectTemp%\%ProgramFolder%\%ProgramVersion%"
-MSIExtract,"%ProjectTemp%\%ProgramFolder%\%ProgramVersion%\AttachedContainer\dotnet-hostfxr-%ProgramVersion%-win-%SourceArch%.msi","%ProjectTemp%\%ProgramFolder%\%ProgramVersion%"
-MSIExtract,"%ProjectTemp%\%ProgramFolder%\%ProgramVersion%\AttachedContainer\dotnet-runtime-%ProgramVersion%-win-%SourceArch%.msi","%ProjectTemp%\%ProgramFolder%\%ProgramVersion%"
-MSIExtract,"%ProjectTemp%\%ProgramFolder%\%ProgramVersion%\AttachedContainer\windowsdesktop-runtime-%ProgramVersion%-win-%SourceArch%.msi","%ProjectTemp%\%ProgramFolder%\%ProgramVersion%"
+MSIExtract,"%ProjectTemp%\%ProgramFolder%\%ProgramVersion%\WixAttachedContainer\dotnet-host-%ProgramVersion%-win-%SourceArch%.msi","%ProjectTemp%\%ProgramFolder%\%ProgramVersion%"
+MSIExtract,"%ProjectTemp%\%ProgramFolder%\%ProgramVersion%\WixAttachedContainer\dotnet-hostfxr-%ProgramVersion%-win-%SourceArch%.msi","%ProjectTemp%\%ProgramFolder%\%ProgramVersion%"
+MSIExtract,"%ProjectTemp%\%ProgramFolder%\%ProgramVersion%\WixAttachedContainer\dotnet-runtime-%ProgramVersion%-win-%SourceArch%.msi","%ProjectTemp%\%ProgramFolder%\%ProgramVersion%"
+MSIExtract,"%ProjectTemp%\%ProgramFolder%\%ProgramVersion%\WixAttachedContainer\windowsdesktop-runtime-%ProgramVersion%-win-%SourceArch%.msi","%ProjectTemp%\%ProgramFolder%\%ProgramVersion%"
 FileCopy,"%ProjectTemp%\%ProgramFolder%\%ProgramVersion%\SourceDir\dotnet\*.*","%TargetPrograms%\%ProgramFolder%"
 
 ///////////////////////////////////////////////////////////////////////////////////
