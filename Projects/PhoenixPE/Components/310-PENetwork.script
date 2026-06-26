@@ -106,7 +106,7 @@ If,%cb_AutoConnectWifi%,Equal,True,Run,%ScriptFile%,PENetwork-AutoConnectWifi
 ///////////////////////////////////////////////////////////////////////////////////
 // AutoRuns
 
-AddAutoRun,Network,NoWait,"","%ProgramFiles%\PENetwork\PENetwork.exe"
+AddAutoRun,Network,NoWait,"","%PEPrograms%\%ProgramFolder%\%ProgramExe%"
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Shortcuts
@@ -141,7 +141,7 @@ FileCopy,%fb_WifiConfig%,"%TargetPrograms%\%ProgramFolder%\WifiProfiles\%WifiCon
 
 ; Get the SSID name from the Wifi profile
 XMLRead,%fb_WifiConfig%,"//_:SSIDConfig/_:SSID/_:name/text()"
-Set,%SSID_Name%,#r
+Set,%SSID_Name%,%^RET%
 If,%SSID_Name%,Equal,"",Halt,"ERROR: Could not read SSID name from WiFi Profile [%fb_WifiConfig%]."
 
 // These are build time settings so write to %TargetPrograms%\%ProgramFolder%, not %ProgramsCache%\%ProgramFolder%
@@ -432,7 +432,7 @@ FileDeleteEx,"%ProjectTemp%\PENetwork.7z"
 // Name...........: ExtractPENetwork
 // Description....: Extract PENetwork program files from script.
 // Syntax.........: Run,%ScriptFile%,ExtractProgram,<DestDir>
-// Parameters.....: #1 DestDir - The directory where the files will be extracted.
+// Parameters.....: DestDir - The directory where the files will be extracted.
 // Return values..: 
 // Author.........: Homes32
 // Remarks........:
@@ -441,7 +441,7 @@ FileDeleteEx,"%ProjectTemp%\PENetwork.7z"
 [ExtractProgram]
 Echo,"Extracting PENetwork..."
 ExtractFile,%ScriptFile%,%SourceArch%,PENetwork.7z,%ProjectTemp%
-Decompress,%ProjectTemp%\PENetwork.7z,#1
+Decompress,%ProjectTemp%\PENetwork.7z,%^SIPARAM_1%
 
 [#BrowseCache#]
 // ===============================================================================================================================
