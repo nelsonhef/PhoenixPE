@@ -30,19 +30,19 @@
 
 [Main]
 Title=HWinfo
-Description=(v8.46) Comprehensive Hardware Analysis, Monitoring and Reporting.
+Description=(v8.50) Comprehensive Hardware Analysis, Monitoring and Reporting.
 Author=Homes32
 Level=5
 Selected=True
 Mandatory=False
 Version=1.1.1.0
-Date=2026-04-16
+Date=2026-07-21
 
 [Variables]
 %ProgramFolder%="HWiNFO"
 %ProgramExe%="hwinfo32.exe"
 %ProgramCfg%="hwinfo32.ini"
-%ProgramVersion%=846
+%ProgramVersion%=850
 %DownloadURL%=https://www.hwinfo.com/files/hwi_%ProgramVersion%.zip
 %SetupFile%="hwinfo.zip"
 %ConfigFile%="%TargetPrograms%\%ProgramFolder%\%ProgramCfg%"
