@@ -35,8 +35,8 @@ Author=Homes32
 Level=2
 Selected=True
 Mandatory=True
-Version=1.2.1.0
-Date=2025-05-31
+Version=1.3.0.0
+Date=2026-06-25
 
 [Variables]
 // Minimum PEBakery version that has the command/feature set that is compatible with PhoenixPE.
@@ -158,6 +158,8 @@ IniRead,"%ProjectDir%\PEBakeryCompat.ini","PEBakeryCompat","OverridableFixedVari
 IniRead,"%ProjectDir%\PEBakeryCompat.ini","PEBakeryCompat","EnableEnvironmentVariables",%EnableEnvironmentVariables%,Default=False
 IniRead,"%ProjectDir%\PEBakeryCompat.ini","PEBakeryCompat","DisableExtendedSectionParams",%DisableExtendedSectionParams%,Default=False
 IniRead,"%ProjectDir%\PEBakeryCompat.ini","PEBakeryCompat","AutoCompactIniWriteCommand",%AutoCompactIniWriteCommand%,Default=False
+IniRead,"%ProjectDir%\PEBakeryCompat.ini","PEBakeryCompat","EnableAllLegacySectionParams",%EnableAllLegacySectionParams%,Default=True
+IniRead,"%ProjectDir%\PEBakeryCompat.ini","PEBakeryCompat","DisableLegacyExtendedSectionParams",%DisableLegacyExtendedSectionParams%,Default=False
 
 If,%DeferredLogging%,Equal,False,Set,%Message%,"WARNING: Logging --> Deferred Logging is disabled. This can significantly increase build time.#$x#$x"
 If,%AsteriskBugDirCopy%,Equal,True,Begin
@@ -180,6 +182,8 @@ If,%AllowSetModifyInterface%,Equal,True,Set,%Message%,"%Message%WARNING: Compati
 If,%LegacyInterfaceCommand%,Equal,True,Set,%Message%,"%Message%WARNING: Compatibility --> Enable legacy interface commands. This option is for legacy projects only and should not be used with %ProjectTitle%.#$x#$x"
 If,%LegacySectionParamCommand%,Equal,True,Set,%Message%,"%Message%WARNING: Compatibility --> Enable legacy section parameter commands. This option is for legacy projects only and should not be used with %ProjectTitle%.#$x#$x"
 If,%AutoCompactIniWriteCommand%,Equal,True,Set,%Message%,"%Message%WARNING: Compatibility --> Auto Compact .ini files on write commands. This option is for legacy projects only and should not be used with %ProjectTitle%.#$x#$x"
+If,%EnableAllLegacySectionParams%,Equal,True,Set,%Message%,"%Message%WARNING: Compatibility --> Enable legacy sharp-styled section parameters. This option can cause data corruption in some situations and should not be used with %ProjectTitle%.#$x#$x"
+If,%DisableLegacyExtendedSectionParams%,Equal,False,Set,%Message%,"%Message%WARNING: Compatibility --> Disable legacy sharp-styled extended section parameters. This option should be enabled for %ProjectTitle% as it prevents data corruption in certain situations.#$x#$x"
 
 If,Not,%Message%,Equal,"",Begin
   If,%CriticalErr%,Equal,True,Begin
@@ -216,12 +220,10 @@ If,Not,ExistFile,"%Tools%\%HostArch%\GetBinaryResource.exe",Run,%ScriptFile%,Err
 If,Not,ExistFile,"%Tools%\%HostArch%\GetStringResource.exe",Run,%ScriptFile%,ErrMissingTool,"GetStringResource.exe"
 If,Not,ExistFile,"%Tools%\%HostArch%\GWT.exe",Run,%ScriptFile%,ErrMissingTool,"GWT.exe"
 If,Not,ExistFile,"%Tools%\%HostArch%\hiderun.exe",Run,%ScriptFile%,ErrMissingTool,"hiderun.exe"
-If,Not,ExistFile,"%Tools%\%HostArch%\jj.exe",Run,%ScriptFile%,ErrMissingTool,"jj.exe"
 If,Not,ExistFile,"%Tools%\%HostArch%\HiveUnload.exe",Run,%ScriptFile%,ErrMissingTool,"HiveUnload.exe"
 If,Not,ExistFile,"%Tools%\x86\innounp.exe",Run,%ScriptFile%,ErrMissingTool,"innounp.exe"
 If,Not,ExistFile,"%Tools%\x86\mkISOfs.exe",Run,%ScriptFile%,ErrMissingTool,"mkISOfs.exe"
 If,Not,ExistFile,"%Tools%\%HostArch%\SetACL.exe",Run,%ScriptFile%,ErrMissingTool,"SetACL.exe"
-If,Not,ExistFile,"%Tools%\x86\xml.exe",Run,%ScriptFile%,ErrMissingTool,"xml.exe"
 
 // WaikTools
 If,Not,ExistFile,"%Tools%\%HostArch%\DISM\dism.exe",Run,%ScriptFile%,GetWaikTools
