@@ -86,10 +86,10 @@ If,Not,%fb_IncludePluginsDir%,Equal,"",If,ExistDir,%fb_IncludePluginsDir%,Begin
   If,%cb_RunFromRam%,Equal,True,FileCopy,"%fb_IncludePluginsDir%\*.*","%TargetAppData%\%ProgramFolder%"
   Else,FileCopy,"%fb_IncludePluginsDir%\*.*","%TargetPrograms%\%ProgramFolder%"
   
-  XMLAdd,SubNode,%ConfigFile%,"configuration/userSettings/ChoEazyCopy.Properties.Settings","elem","setting",""
-  XMLAdd,Insert,%ConfigFile%,"configuration/userSettings/ChoEazyCopy.Properties.Settings/setting[not(@name)]","attr","name","BackupTaskDirectory"
-  XMLAdd,Append,%ConfigFile%,"configuration/userSettings/ChoEazyCopy.Properties.Settings/setting[@name='BackupTaskDirectory']","attr","serializeAs","String"
-  XMLAdd,SubNode,%ConfigFile%,"configuration/userSettings/ChoEazyCopy.Properties.Settings/setting[@name='BackupTaskDirectory']","elem","value","%PEPrograms%\%ProgramFolder%"
+  XMLAdd,SubNode,%ConfigFile%,"configuration/userSettings/ChoEazyCopy.Properties.Settings","Element","setting",""
+  XMLAdd,Insert,%ConfigFile%,"configuration/userSettings/ChoEazyCopy.Properties.Settings/setting[not(@name)]","Attribute","name","BackupTaskDirectory"
+  XMLAdd,Append,%ConfigFile%,"configuration/userSettings/ChoEazyCopy.Properties.Settings/setting[@name='BackupTaskDirectory']","Attribute","serializeAs","String"
+  XMLAdd,SubNode,%ConfigFile%,"configuration/userSettings/ChoEazyCopy.Properties.Settings/setting[@name='BackupTaskDirectory']","Element","value","%PEPrograms%\%ProgramFolder%"
 End
 
 ///////////////////////////////////////////////////////////////////////////////////

@@ -69,7 +69,7 @@ TXTAddLine,%ConfigFile%,"<?xml version=#$q1.0#$q encoding=#$qutf-8#$q?><configur
 // Language
 StrFormat,SPLIT,%cmb_Language%,"[",2,%Lang%
 StrFormat,RTRIM,%Lang%,1,%Lang%
-XMLAdd,SubNode,%ConfigFile%,"configuration/userSettings/Roaming/Rapr.Properties.Settings","elem","Language",%Lang%
+XMLAdd,SubNode,%ConfigFile%,"configuration/userSettings/Roaming/Rapr.Properties.Settings","Element","Language",%Lang%
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Shortcuts

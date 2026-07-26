@@ -35,8 +35,8 @@ Author=Homes32
 Level=2
 Selected=True
 Mandatory=True
-Version=1.2.1.0
-Date=2024-01-18
+Version=1.2.2.0
+Date=2026-07-03
 
 [TODO]
 // Finish RunOnceEx
@@ -216,6 +216,10 @@ RegWrite,HKLM,REG_DWORD,"Tmp_System\ControlSet001\Control\FileSystem","RefsDisab
 
 // Allow ReFS Format
 RegWrite,HKLM,REG_DWORD,"Tmp_System\ControlSet001\Control\MiniNT","AllowRefsFormatOverNonmirrorVolume",1
+
+// Don't allow auto ReFS version upgrades if we are running higher ReFS version then the partition we are mounting.
+// Upgrading to a newer version then the host OS supports can result in the partition appearing as RAW or inaccessible to the host.
+RegWrite,HKLM,REG_DWORD,"Tmp_System\ControlSet001\Control\FileSystem","RefsDisableVolumeUpgrade",1
 
 // If you need to support ancient insecure samba servers change this value to a 2
 RegWrite,HKLM,REG_DWORD,"Tmp_System\ControlSet001\Control\Lsa","LmCompatibilityLevel",3

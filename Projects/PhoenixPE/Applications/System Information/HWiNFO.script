@@ -30,19 +30,19 @@
 
 [Main]
 Title=HWiNFO
-Description=(v8.46) Comprehensive Hardware Analysis, Monitoring and Reporting.
+Description=(v8.50) Comprehensive Hardware Analysis, Monitoring and Reporting.
 Author=Homes32
 Level=5
 Selected=False
 Mandatory=False
-Version=1.1.9.0
-Date=2026-05-18
+Version=1.1.11.0
+Date=2026-07-25
 
 [Variables]
 %ProgramFolder%="HWiNFO"
 %ProgramExe%="hwinfo32.exe"
 %ProgramCfg%="hwinfo32.ini"
-%ProgramVersion%="846"
+%ProgramVersion%="850"
 %DownloadURL%=https://www.hwinfo.com/files/hwi_%ProgramVersion%.zip
 %SetupFile%="hwinfo-%ProgramVersion%.zip"
 %ConfigFile%="%TargetPrograms%\%ProgramFolder%\%ProgramCfg%"
@@ -135,7 +135,7 @@ If,Not,%^RET%,Equal,0,Halt,"Error: Failed to extract [%SetupFile%]."
 Echo,"Downloading %ScriptTitle%..."
 WebGetEx,%DownloadURL%,"%ProgramsCache%\%ProgramFolder%\%SetupFile%",Referer=https://www.hwinfo.com/download/,NOERR
 If,Not,%^RET%,Equal,0,Begin
-  // Try incrementing the version number up to 10 times
+  // Try to increment the version number up to 10 times
   ForRange,%i%,0,10,1,Begin
     Math,Add,%ProgramVersion%,%ProgramVersion%,1
 	WebGetEx,%DownloadURL%,"%ProgramsCache%\%ProgramFolder%\%SetupFile%",Referer=https://www.hwinfo.com/download/,NOERR

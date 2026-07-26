@@ -30,20 +30,20 @@
 
 [Main]
 Title=DiskCryptor
-Description=(v1.4.1 Beta) DiskCryptor is an open source encryption solution that offers encryption of all disk partitions, including system partitions.
+Description=(v2.0.1) DiskCryptor is an open source encryption solution that offers encryption of all disk partitions, including system partitions.
 Author=Homes32
 Level=5
 Selected=False
 Mandatory=False
-Version=1.0.4.0
-Date=2026-03-27
+Version=1.0.5.0
+Date=2026-07-25
 
 [Variables]
 %ProgramFolder%="DiskCryptor"
 %ProgramExe%="dcrypt.exe"
-%ProgramVersion%="1.4.1
+%ProgramVersion%="2.0.1
 %SetupFile%="Dcrypt-%ProgramVersion%.exe"
-%DownloadURL%=https://github.com/DavidXanatos/DiskCryptor/releases/download/v%ProgramVersion%/dcrypt_setup_1.4.1_beta.exe
+%DownloadURL%=https://github.com/DavidXanatos/DiskCryptor/releases/download/v%ProgramVersion%/dcrypt_setup_%ProgramVersion%.exe
 
 [Process]
 Echo,"Processing %ScriptTitle%..."

@@ -140,8 +140,7 @@ StrFormat,FILENAME,%fb_WifiConfig%,%WifiConfig_FileName%
 FileCopy,%fb_WifiConfig%,"%TargetPrograms%\%ProgramFolder%\WifiProfiles\%WifiConfig_FileName%"
 
 ; Get the SSID name from the Wifi profile
-XMLRead,%fb_WifiConfig%,"//_:SSIDConfig/_:SSID/_:name/text()"
-Set,%SSID_Name%,%^RET%
+XMLRead,%fb_WifiConfig%,"//_:SSIDConfig/_:SSID/_:name/text()",%SSID_Name%
 If,%SSID_Name%,Equal,"",Halt,"ERROR: Could not read SSID name from WiFi Profile [%fb_WifiConfig%]."
 
 // These are build time settings so write to %TargetPrograms%\%ProgramFolder%, not %ProgramsCache%\%ProgramFolder%

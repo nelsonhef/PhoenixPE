@@ -43,7 +43,7 @@ Date=2026-05-17
 %ProgramExe%="AgentRansack.exe"
 %ProgramVersion%="3562"
 %SetupFile%="AgentRansack-%ProgramVersion%.exe"
-%DownloadURL%=https://download.mythicsoft.com/flp/%ProgramVersion%/fdw_mxj9ech.XJB7zwt/agentransack_%SourceArch%_msi_%ProgramVersion%.zip
+%DownloadURL%=https://download.mythicsoft.com/flp/%ProgramVersion%/X4aef2vyu.bzx/agentransack_%SourceArch%_msi_%ProgramVersion%.zip
 
 [Process]
 Echo,"Processing %ScriptTitle%..."
@@ -259,7 +259,7 @@ System,EndLocal
 // ===============================================================================================================================
 [DownloadProgram]
 Echo,"Downloading AgentRansack..."
-WebGet,%DownloadURL%,"%ProgramsCache%\%ProgramFolder%\%SetupFile%",NOERR
+WebGet,%DownloadURL%,"%ProgramsCache%\%ProgramFolder%\%SetupFile%",Referer=https://www.mythicsoft.com/agentransack/,NOERR
 If,Not,%^RET%,Equal,200,Halt,"Download failed: The code returned was [%^RET%]."
 
 [#LaunchProgram#]

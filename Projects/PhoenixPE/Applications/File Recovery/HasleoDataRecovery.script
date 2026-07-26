@@ -35,14 +35,14 @@ Author=Homes32
 Level=5
 Selected=False
 Mandatory=False
-Version=1.0.1.0
-Date=2025-03-08
+Version=1.0.2.0
+Date=2026-07-19
 
 [Variables]
 %ProgramFolder%="Hasleo Data Recovery"
 %ProgramExe%="MainUI.exe"
 %ProgramVersion%=
-%DownloadURL%=https://www.hasleo.com/downloads/hdr_free.exe
+%DownloadURL%=https://www.easyuefi.com/data-recovery/downloads/hdr_free.exe
 %SetupFile%="HasleoDataRecoveryFree.exe"
 %ConfigFile%="%TargetPrograms%\%ProgramFolder%\MainUI.ini"
 %aLangMap%=Chinese (Simplified)|zh_CN|English (US)|en_US|Japanese|ja_JP|Korean|ko_KR|Polish|pl_PL|Portuguese (Brazil)|pt_BR|Spanish|es_ES

@@ -30,18 +30,18 @@
 
 [Main]
 Title=DiskGenius
-Description=(v6.1.1.1742) DiskGenius is an all-in-one Data Recovery, Partition Manager, and Backup/Cloning Utility for IT Professionals.
+Description=(v6.2.0.1829) DiskGenius is an all-in-one Data Recovery, Partition Manager, and Backup/Cloning Utility for IT Professionals.
 Author=Homes32
 Level=5
 Selected=False
 Mandatory=False
-Version=1.1.9.0
-Date=2026-03-27
+Version=1.1.10.0
+Date=2026-07-04
 
 [Variables]
 %ProgramFolder%="DiskGenius"
 %ProgramExe%="DiskGenius.exe"
-%ProgramVersion%="6111742"
+%ProgramVersion%="6201829"
 %SetupFile%="DiskGenius-%ProgramVersion%-%SourceArch%.zip"
 %DownloadURLx86%=https://download.eassos.com/DGEng%ProgramVersion%_x86.zip
 %DownloadURLx64%=https://download.eassos.com/DGEng%ProgramVersion%_x64.zip

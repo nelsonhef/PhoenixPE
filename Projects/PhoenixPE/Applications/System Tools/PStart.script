@@ -62,8 +62,8 @@ Run,%ScriptFile%,ExtractProgram,"%TargetPrograms%\%ProgramFolder%"
 Echo,"Configuring %ScriptTitle%..."
 FileCreateBlank,%ConfigFile%
 TXTAddLine,%ConfigFile%,"<start><panel></panel></start>",Append
-If,%cb_ShowPanel%,Equal,True,XMLAdd,SubNode,%ConfigFile%,"start/panel","elem","showonstartup","True"
-Else,XMLAdd,SubNode,%ConfigFile%,"start/panel","elem","showonstartup","False"
+If,%cb_ShowPanel%,Equal,True,XMLAdd,SubNode,%ConfigFile%,"start/panel","Element","showonstartup","True"
+Else,XMLAdd,SubNode,%ConfigFile%,"start/panel","Element","showonstartup","False"
 
 // Keep custom config after script config so we don't overwrite it.
 If,ExistFile,%fb_ImportCfg%,Begin

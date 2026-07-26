@@ -30,20 +30,20 @@
 
 [Main]
 Title=Google Chrome
-Description=(v149.0.7827.103) Google Chrome is a cross-platform web browser developed by Google.
+Description=(v150.0.7871.47) Google Chrome is a cross-platform web browser developed by Google.
 Author=Homes32
 Level=5
 Selected=False
 Mandatory=False
-Version=1.1.24.0
-Date=2026-06-11
+Version=1.1.26.0
+Date=2026-07-25
 
 [Variables]
 %ProgramFolder%="Chrome"
 %ProgramExe%="chrome.exe"
-%ProgramVersion%="148.0.7778.168"
-%DownloadURLx86%=https://dl.google.com/release2/chrome/adkarrjsded6kgeradub5c5lppsa_149.0.7827.103/149.0.7827.103_chrome_installer_uncompressed.exe
-%DownloadURLx64%=https://dl.google.com/release2/chrome/adh7d3qwucqfjphrqm2o27nyvcaq_149.0.7827.103/149.0.7827.103_chrome_installer_uncompressed.exe
+%ProgramVersion%="150.0.7871.187"
+%DownloadURLx86%=https://dl.google.com/release2/chrome/ad723hqdgj643yfirykks36a2lmq_150.0.7871.187/150.0.7871.187_chrome_installer_uncompressed.exe
+%DownloadURLx64%=https://dl.google.com/release2/chrome/advqzie6g3gpcqe35ou4bp5inmbq_150.0.7871.187/150.0.7871.187_chrome_installer_uncompressed.exe
 %SetupFile%="Chrome-%ProgramVersion%-%SourceArch%.exe"
 
 [Process]

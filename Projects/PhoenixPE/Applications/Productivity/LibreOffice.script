@@ -32,15 +32,15 @@
 Title=LibreOffice
 Author=Homes32
 Level=5
-Version=1.1.0.0
-Description=(v26.2.1 x64) LibreOffice is a free and powerful office suite.
-Date=2026-03-27
+Version=1.2.1.0
+Description=(v26.2.4 x64) LibreOffice is a free and powerful office suite.
+Date=2026-07-25
 Selected=False
 Mandatory=False
 
 [Variables]
 %ProgramFolder%="LibreOffice"
-%ProgramVersion%="26.2.1"
+%ProgramVersion%="26.2.4"
 %ProgramExe%="program\soffice.exe"
 %DownloadURL-Std%=https://download.documentfoundation.org/libreoffice/portable/%ProgramVersion%/LibreOfficePortable_%ProgramVersion%_MultilingualStandard.paf.exe
 %DownloadURL-AllLang%=https://download.documentfoundation.org/libreoffice/portable/%ProgramVersion%/LibreOfficePortable_%ProgramVersion%_MultilingualAll.paf.exe
@@ -88,8 +88,6 @@ RequireFileEx,ExtractList
 ///////////////////////////////////////////////////////////////////////////////////
 // Settings
 
-// registrymodifications.xcu uses a convoluted XML schema that makes using XPATH extremely difficult, so we are using TXTReplace to append to the end of the file in those instances where we know the entry doesn't already exist
-
 Echo,"Configuring LibreOffice..."
 
 // Configure our settings folder. Note: Use UNIX style path!
@@ -98,28 +96,80 @@ IniWrite,"%TargetPrograms%\%ProgramFolder%\program\bootstrap.ini","Bootstrap","U
 // Language
 StrFormat,SPLIT,%cmb_Language%,"[",2,%lng%
 StrFormat,RTRIM,%lng%,1,%lng%
-
 IniWrite,"%TargetPrograms%\%ProgramFolder%\program\soffice.ini","Bootstrap","STARTLANG",%lng%
-XMLUpdate,%registrymodifications.xcu%,"/oor:items/item/prop[@oor:name='UILocale']/value",%lng%
-XMLUpdate,%registrymodifications.xcu%,"/oor:items/item/prop[@oor:name='ooLocale']/value",%lng%
+XMLUpdate,%registrymodifications.xcu%,"oor:items/item/prop[@oor:name='UILocale']/value",%lng%
+XMLUpdate,%registrymodifications.xcu%,"oor:items/item/prop[@oor:name='ooLocale']/value",%lng%
 
-// Disable file ext check, TipOfTheDay, etc.
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Office.Common/Help#$q><prop oor:name=#$qBuiltInHelpNotInstalledPopUp#$q oor:op=#$qfuse#$q><value>false</value></prop></item>#$x</oor:items>"
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Office.Common/Misc#$q><prop oor:name=#$qFirstRun#$q oor:op=#$qfuse#$q><value>false</value></prop></item>#$x</oor:items>"
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Office.Common/Misc#$q><prop oor:name=#$qPerformFileExtCheck#$q oor:op=#$qfuse#$q><value>false</value></prop></item>#$x</oor:items>"
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Office.Common/Misc#$q><prop oor:name=#$qShowTipOfTheDay#$q oor:op=#$qfuse#$q><value>false</value></prop></item>#$x</oor:items>"
+// Update the Temp WritePath
+XMLUpdate,%registrymodifications.xcu%,"oor:items/item[@oor:path=#$q/org.openoffice.Office.Paths/Paths/org.openoffice.Office.Paths:NamedPath['Temp']#$q]/prop[@oor:name='WritePath']/value","$TEMP"
 
-// Default Folders
-TXTReplace,%registrymodifications.xcu%,"<value>XXX</value>","<value>$TEMP</value>"
-TXTReplace,%registrymodifications.xcu%,"<value>DEFAULT--WORK--PATH</value>","<value>$SYSUSERHOME</value>"
+// Update the Work WritePath
+XMLUpdate,%registrymodifications.xcu%,"oor:items/item[@oor:path=#$q/org.openoffice.Office.Paths/Paths/org.openoffice.Office.Paths:NamedPath['Work']#$q]/prop[@oor:name='WritePath']/value","$SYSUSERHOME"
 
-// Disable Update Check
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Office.Jobs/Jobs/org.openoffice.Office.Jobs:Job['UpdateCheck']/Arguments#$q><prop oor:name=#$qAutoCheckEnabled#$q oor:op=#$qfuse#$q oor:type=#$qxs:boolean#$q><value>false</value></prop></item>#$x</oor:items>"
+// BuiltInHelpNotInstalledPopUp
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Office.Common/Help"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","BuiltInHelpNotInstalledPopUp"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","false"
 
-// Set MS Office as default document types
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Setup/Office/Factories/org.openoffice.Setup:Factory['com.sun.star.text.TextDocument']#$q><prop oor:name=#$qooSetupFactoryDefaultFilter#$q oor:op=#$qfuse#$q><value>MS Word 2007 XML</value></prop></item>#$x</oor:items>"
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Setup/Office/Factories/org.openoffice.Setup:Factory['com.sun.star.sheet.SpreadsheetDocument']#$q><prop oor:name=#$qooSetupFactoryDefaultFilter#$q oor:op=#$qfuse#$q><value>Calc MS Excel 2007 XML</value></prop></item>#$x</oor:items>"
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Setup/Office/Factories/org.openoffice.Setup:Factory['com.sun.star.presentation.PresentationDocument']#$q><prop oor:name=#$qooSetupFactoryDefaultFilter#$q oor:op=#$qfuse#$q><value>Impress MS PowerPoint 2007 XML</value></prop></item>#$x</oor:items>"
+// FirstRun
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Office.Common/Misc"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","FirstRun"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","false"
+
+// PerformFileExtCheck
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Office.Common/Misc"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","PerformFileExtCheck"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","false"
+
+// ShowTipOfTheDay
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Office.Common/Misc"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","ShowTipOfTheDay"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","false"
+
+// AutoCheckEnabled (note extra oor:type attribute)
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Office.Jobs/Jobs/org.openoffice.Office.Jobs:Job['UpdateCheck']/Arguments"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","AutoCheckEnabled"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:type","xs:boolean"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","false"
+
+// Writer default filter
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Setup/Office/Factories/org.openoffice.Setup:Factory['com.sun.star.text.TextDocument']"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","ooSetupFactoryDefaultFilter"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","MS Word 2007 XML"
+
+// Calc default filter
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Setup/Office/Factories/org.openoffice.Setup:Factory['com.sun.star.sheet.SpreadsheetDocument']"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","ooSetupFactoryDefaultFilter"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","Calc MS Excel 2007 XML"
+
+// Impress default filter
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Setup/Office/Factories/org.openoffice.Setup:Factory['com.sun.star.presentation.PresentationDocument']"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","ooSetupFactoryDefaultFilter"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","Impress MS PowerPoint 2007 XML"
 
 // Toolbar Mode
 If,%cmb_UIMode%,Equal,"Standard Toolbar",Set,%ToolbarMode%,"Default"
@@ -131,14 +181,69 @@ Else,If,%cmb_UIMode%,Equal,"Groupedbar Compact",Set,%ToolbarMode%,"notebookbar_g
 Else,If,%cmb_UIMode%,Equal,"Contextual Single",Set,%ToolbarMode%,"notebookbar_single.ui"
 Else,Halt,"INTERNAL LOGIC ERROR: Invalid UI Mode [%cmb_UIMode%] Selected."
 
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Office.UI.ToolbarMode#$q><prop oor:name=#$qActiveCalc#$q oor:op=#$qfuse#$q><value>%ToolbarMode%</value></prop></item>#$x</oor:items>"
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Office.UI.ToolbarMode/Applications/org.openoffice.Office.UI.ToolbarMode:Application['Calc']#$q><prop oor:name=#$qActive#$q oor:op=#$qfuse#$q><value>%ToolbarMode%</value></prop></item>#$x</oor:items>"
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Office.UI.ToolbarMode#$q><prop oor:name=#$qActiveDraw#$q oor:op=#$qfuse#$q><value>%ToolbarMode%</value></prop></item>#$x</oor:items>"
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Office.UI.ToolbarMode/Applications/org.openoffice.Office.UI.ToolbarMode:Application['Draw']#$q><prop oor:name=#$qActive#$q oor:op=#$qfuse#$q><value>%ToolbarMode%</value></prop></item>#$x</oor:items>"
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Office.UI.ToolbarMode#$q><prop oor:name=#$qActiveImpress#$q oor:op=#$qfuse#$q><value>%ToolbarMode%</value></prop></item>#$x</oor:items>"
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Office.UI.ToolbarMode/Applications/org.openoffice.Office.UI.ToolbarMode:Application['Impress']#$q><prop oor:name=#$qActive#$q oor:op=#$qfuse#$q><value>%ToolbarMode%</value></prop></item>#$x</oor:items>"
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Office.UI.ToolbarMode#$q><prop oor:name=#$qActiveWriter#$q oor:op=#$qfuse#$q><value>%ToolbarMode%</value></prop></item>#$x</oor:items>"
-TXTReplace,%registrymodifications.xcu%,"</oor:items>","<item oor:path=#$q/org.openoffice.Office.UI.ToolbarMode/Applications/org.openoffice.Office.UI.ToolbarMode:Application['Writer']#$q><prop oor:name=#$qActive#$q oor:op=#$qfuse#$q><value>%ToolbarMode%</value></prop></item>#$x</oor:items>"
+// ActiveCalc (ToolbarMode root)
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Office.UI.ToolbarMode"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","ActiveCalc"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","Default"
+
+// Active (Calc application)
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Office.UI.ToolbarMode/Applications/org.openoffice.Office.UI.ToolbarMode:Application['Calc']"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","Active"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","Default"
+
+// ActiveDraw (ToolbarMode root)
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Office.UI.ToolbarMode"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","ActiveDraw"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","Default"
+
+// Active (Draw application)
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Office.UI.ToolbarMode/Applications/org.openoffice.Office.UI.ToolbarMode:Application['Draw']"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","Active"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","Default"
+
+// ActiveImpress (ToolbarMode root)
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Office.UI.ToolbarMode"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","ActiveImpress"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","Default"
+
+// Active (Impress application)
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Office.UI.ToolbarMode/Applications/org.openoffice.Office.UI.ToolbarMode:Application['Impress']"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","Active"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","Default"
+
+// ActiveWriter (ToolbarMode root)
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Office.UI.ToolbarMode"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","ActiveWriter"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","Default"
+
+// Active (Writer application)
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items","Element","item",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Attribute","oor:path","/org.openoffice.Office.UI.ToolbarMode/Applications/org.openoffice.Office.UI.ToolbarMode:Application['Writer']"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]","Element","prop",""
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:name","Active"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Attribute","oor:op","fuse"
+XMLAdd,Append,%registrymodifications.xcu%,"oor:items/item[last()]/prop","Element","value","Default"
 
 // File Associations
 If,%cb_AssociateFiles%,Equal,True,Begin

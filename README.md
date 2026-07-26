@@ -70,7 +70,7 @@ Full build instructions are on the [Building PhoenixPE](https://github.com/Phoen
 PhoenixPE is developer-friendly and designed to be extended. You can include additional applications, configure app settings at build time, register shell extensions and file handlers, and tailor almost every aspect of the environment to your needs.
 
 Useful resources for getting started:
-- [PEBakery Documentation](https://github.com/pebakery/pebakery-docs)
+- [PEBakery Documentation](https://github.com/pebakery/pebakery-docs/tree/develop)
 - [PhoenixPE API](https://github.com/PhoenixPE/PhoenixPE/wiki/PhoenixAPI)
 - [Project Variables](https://github.com/PhoenixPE/PhoenixPE/wiki/ProjectVars)
 
@@ -97,12 +97,12 @@ Popular pre-made ISOs like Hiren's, Gandalf's, MediCat, and Sergei are often bui
 
 Some sketcher pre-built ISO's hide freely available software behind paywalls, and bundle Warez putting you at legal risk.
 
-Since you have no visibility into what's actually baked into someone else's ISO, you're trusting a stranger on the internet to provide you with a tool that will be run on your computers with full system access. In the end, you're just using someone else's custom build, stuck with their choice of apps, their customizations, their update schedule, and their definition of "safe".
+Since you have no visibility into what's actually baked into someone else's ISO, you're trusting a stranger on the internet to provide you with a tool that will be run on your computer with full system access. In the end, you're just using someone else's custom build, stuck with their choice of apps, their customizations, their update schedule, and their definition of "safe".
 
 Building PhoenixPE yourself means you control exactly what's included, keep everything current and secure, add your own apps and license keys, and get it all in your native language. Put in a little work and reap the rewards — it's worth the effort.
 
 ### Can I request an application be included?
-It's impossible to bundle every application, and everyone has different needs. Instead, the scripting system makes it easy for *you* to include your favorite applications. Check out the resources above and ask in the forums if you need a hand.
+It's impossible for us to bundle and maintain every application, and everyone has different needs. Instead, the scripting system makes it easy for *you* to include your favorite applications. Check out the resources above and ask in the forums if you need a hand.
 
 See the full [FAQ: Can you include XYZ application in PhoneixPE](https://github.com/PhoenixPE/PhoenixPE/wiki/FAQ#can-you-include-xyz-application-in-phoneixpe) for more information.
 
@@ -113,7 +113,7 @@ PhoenixPE is developed and maintained by a community of volunteers. Contribution
 - Read the [Contributor Guidelines](https://github.com/PhoenixPE/PhoenixPE/blob/master/docs/CONTRIBUTING.md) before submitting.
 - Browse [open issues](https://github.com/PhoenixPE/PhoenixPE/issues) to find something to work on.
 - Report bugs or suggest features via the [issue tracker](https://github.com/PhoenixPE/PhoenixPE/issues).
-- Monitor our forums and share your knowledge and experience with other users.
+- Monitor [our forums](https://github.com/PhoenixPE/PhoenixPE?tab=readme-ov-file#community--support) and share your knowledge and experience with other users.
 
 ## Community & Support
 
