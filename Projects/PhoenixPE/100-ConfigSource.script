@@ -218,8 +218,7 @@ System,Cursor,Normal
 // Name...........: GetImgInfo_Loop
 // Description....: Loop through the given number of Images and retrieve information.
 // Syntax.........: Loop,%ScriptFile%,GetImgInfo_Loop,<StartImage>,<ImageCount>,<WimFile>
-// Parameters.....: #1 - Full path to the .wim file
-//                  #c - Image Index
+// Parameters.....: WimFile - Full path to the .wim file
 // Return values..: %imgVerMaj% - Major Version
 //                  %imgVerMin% - Minor Version
 //                  %imgVerBld% - Build
@@ -236,23 +235,23 @@ System,Cursor,Normal
 // Related........:
 // ===============================================================================================================================
 [GetImgInfo_Loop]
-StrFormat,FileName,#1,%WimFile%
-Echo,"Getting image info from %WimFile% [#c]..."
-WimInfo,#1,#c,NAME,%imgName%
+StrFormat,FileName,%^SIPARAM_1%,%WimFile%
+Echo,"Getting image info from %WimFile% [%^LOOP_IDX%]..."
+WimInfo,%^SIPARAM_1%,%^LOOP_IDX%,NAME,%imgName%
 // Keep from halting our build if there is no DISPLAYNAME property in the XML (eg. Boot.wim).
 Set,%imgDisplayName%,""
-WimInfo,#1,#c,DISPLAYNAME,%imgDisplayName%,NOERR
-WimInfo,#1,#c,WINDOWS/VERSION/MAJOR,%imgVerMaj%
-WimInfo,#1,#c,WINDOWS/VERSION/MINOR,%imgVerMin%
-WimInfo,#1,#c,WINDOWS/VERSION/BUILD,%imgVerBld%
-WimInfo,#1,#c,WINDOWS/VERSION/SPBUILD,%imgVerSPBld%
-WimInfo,#1,#c,WINDOWS/ARCH,%imgArch%
-WimInfo,#1,#c,WINDOWS/LANGUAGES/DEFAULT,%imgLang%
+WimInfo,%^SIPARAM_1%,%^LOOP_IDX%,DISPLAYNAME,%imgDisplayName%,NOERR
+WimInfo,%^SIPARAM_1%,%^LOOP_IDX%,WINDOWS/VERSION/MAJOR,%imgVerMaj%
+WimInfo,%^SIPARAM_1%,%^LOOP_IDX%,WINDOWS/VERSION/MINOR,%imgVerMin%
+WimInfo,%^SIPARAM_1%,%^LOOP_IDX%,WINDOWS/VERSION/BUILD,%imgVerBld%
+WimInfo,%^SIPARAM_1%,%^LOOP_IDX%,WINDOWS/VERSION/SPBUILD,%imgVerSPBld%
+WimInfo,%^SIPARAM_1%,%^LOOP_IDX%,WINDOWS/ARCH,%imgArch%
+WimInfo,%^SIPARAM_1%,%^LOOP_IDX%,WINDOWS/LANGUAGES/DEFAULT,%imgLang%
 
 // Fallback Lang
 // Keep from halting our build if there is no FALLBACK property in the XML.
 Set,%imgFallbackLang%,""
-WimInfo,#1,#c,WINDOWS/LANGUAGES/FALLBACK,%imgFallbackLang%,NOERR
+WimInfo,%^SIPARAM_1%,%^LOOP_IDX%,WINDOWS/LANGUAGES/FALLBACK,%imgFallbackLang%,NOERR
 StrFormat,Replace,%imgFallbackLang%,#$c,|,%imgFallbackLang%
 Set,%imgFallbackLang%,%imgLang%|%imgFallbackLang%
 StrFormat,CTrim,%imgFallbackLang%,|,%imgFallbackLang%
@@ -263,11 +262,11 @@ Else,Set,%imgArch%,"x64"
 
 // Setup %imgNameList% with friendly image names
 If,%imgDisplayName%,Equal,"",Begin
-  List,Append,%imgIndexList%,"#c - %imgName%"
+  List,Append,%imgIndexList%,"%^LOOP_IDX% - %imgName%"
   List,Append,%imgNameList%,"%imgName%"
 End
 Else,Begin
-  List,Append,%imgIndexList%,"#c - %imgDisplayName%"
+  List,Append,%imgIndexList%,"%^LOOP_IDX% - %imgDisplayName%"
   List,Append,%imgNameList%,"%imgDisplayName%"
 End
 
@@ -371,14 +370,14 @@ If,%FreeSpaceBytes%,Smaller,%ISOSizeBytes%,Begin
 End
 Echo,"Extracting [%ISOtoExtract%] to [%ExtractToDir%]...#$x#$xThis can take awhile, please be patient."
 7z,"x -y -bsp1 #$q%ISOtoExtract%#$q -o#$q%ExtractToDir%#$q"
-If,#r,Equal,0,Begin
+If,%^RET%,Equal,0,Begin
   // Success
   If,Question,"The ISO was successfully extracted. Would you like to configure it as your source?",Begin
 	WriteInterface,Value,%ScriptFile%,Interface,fb_SrcPath,%ExtractToDir%
 	Run,%ScriptFile%,SaveSource
   End
 End
-Else,Halt,"ERROR: Failed to extract [%ISOtoExtract%]. The error code returned was [#r]. See log for details."
+Else,Halt,"ERROR: Failed to extract [%ISOtoExtract%]. The error code returned was [%^RET%]. See log for details."
 System,EndLocal
 
 [#SetDefaultOptions#]
