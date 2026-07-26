@@ -32,7 +32,7 @@
 Title=PhoenixPE API
 Author=Homes32
 Description=PhoenixPE scripting support library.
-Version=1.15.0.0
+Version=1.16.0.0
 Date=2026-05-20
 Level=0
 Selected=None
@@ -65,11 +65,6 @@ InnoCleanup=Run,%API%,_PhoenixAPI_InnoCleanup
 InnoExtract=Run,%API%,_PhoenixAPI_InnoExtract
 InnoRename=Run,%API%,_PhoenixAPI_InnoRename
 Innounp=Run,%API%,_PhoenixAPI_Innounp
-JSONCompact=Run,%API%,_PhoenixAPI_JSONCompact
-JSONDelete=Run,%API%,_PhoenixAPI_JSONDelete
-JSONPretty=Run,%API%,_PhoenixAPI_JSONPretty
-JSONRead=Run,%API%,_PhoenixAPI_JSONRead
-JSONWrite=Run,%API%,_PhoenixAPI_JSONWrite
 MSIExtract=Run,%API%,_PhoenixAPI_MSIExtract
 PinShortcut=Run,%API%,_PhoenixAPI_PinShortcut
 RegCopyDriver=Run,%API%,_PhoenixAPI_RegCopyDriver
@@ -83,11 +78,6 @@ SetFileACL=Run,%API%,_PhoenixAPI_SetFileACL
 SetRegACL=Run,%API%,_PhoenixAPI_SetRegACL
 WebGetEx=Run,%API%,_PhoenixAPI_WebGetEx
 WixExtract=Run,%API%,_PhoenixAPI_WixExtract
-XMLAdd=Run,%API%,_PhoenixAPI_XMLAdd
-XMLDelete=Run,%API%,_PhoenixAPI_XMLDelete
-XMLRead=Run,%API%,_PhoenixAPI_XMLRead
-XMLRename=Run,%API%,_PhoenixAPI_XMLRename
-XMLUpdate=Run,%API%,_PhoenixAPI_XMLUpdate
 
 [#_PhoenixAPI_7z#]
 // ===============================================================================================================================
@@ -466,6 +456,7 @@ Else,Begin
   RegWrite,HKLM,REG_EXPAND_SZ,"Tmp_Software\Classes\%FileExt%file\DefaultIcon","","#$q%Program%#$q"
   RegWrite,HKLM,REG_EXPAND_SZ,"Tmp_Software\Classes\%FileExt%file\shell\open\command","","#$q%Program%#$q #$q#$p1#$q"
   If,%RegHivesLoaded%,Equal,False,RegHiveUnLoad,Tmp_Software
+  AddStartupConfig,PreShell,"SetFTA('.%FileExt%','%FileExt%file')",Append
   Echo,""
 End
 
@@ -1231,148 +1222,6 @@ Return,%ExitCode%
 
 System,EndLocal
 
-[#_PhoenixAPI_JSONCompact#]
-// ===============================================================================================================================
-// Name...........: JSONCompact
-// Description....: Experimental wrapper for jj - Compress the JSON into the fewest characters possible by squashing newlines and spaces.
-// Syntax.........: JSONCompact,<JSONFile>
-// Parameters.....: JSONFile - Full path to the JSON filed to compact.
-// Return values..: 
-// Author.........: Homes32
-// Remarks........: https://github.com/tidwall/jj
-// Related........: Depends on %Tools%\%HostArch%\jj.exe
-// ===============================================================================================================================
-[_PhoenixAPI_JSONCompact]
-System,SetLocal
-GetParam,1,%JSONFile%
-
-If,Not,ExistFile,%JSONFile%,Halt,"JSONCompact Syntax Error: The file [%JSONFile%] does not exist."
-
-ShellExecute,Hide,"%Tools%\%HostArch%\jj.exe","-u -i #$q%JSONFile%#$q -o #$q%JSONFile%#$q"
-If,Not,%^RET%,Equal,0,Halt,"JSONCompact Error: Failed to compact [%JSONFile%]."
-
-System,EndLocal
-
-[#_PhoenixAPI_JSONDelete#]
-// ===============================================================================================================================
-// Name...........: JSONDelete
-// Description....: Experimental wrapper for jj - Delete an JSON value.
-// Syntax.........: JSONDelete,<JSONFile>,<Path>
-// Parameters.....: JSONFile - Full path to the JSON filed to edit.
-//                  Path - GJSON Path notation used to locate the value to delete.
-// Return values..: 
-// Author.........: Homes32
-// Remarks........: jj.exe Homepage:  https://github.com/tidwall/jj
-//                  Path Syntax Help: https://github.com/tidwall/gjson/blob/master/SYNTAX.md
-// Related........: Depends on %Tools%\%HostArch%\jj.exe
-// ===============================================================================================================================
-[_PhoenixAPI_JSONDelete]
-System,SetLocal
-GetParam,1,%JSONFile%
-GetParam,2,%Path%
-
-If,Not,ExistFile,%JSONFile%,Halt,"JSONDelete Syntax Error: The file [%JSONFile%] does not exist."
-If,%Path%,Equal,"",Halt,"JSONDelete Syntax Error: You must specify an JSON Path."
-
-ShellExecute,Hide,"%Tools%\%HostArch%\jj.exe","-D -i #$q%JSONFile%#$q -o #$q%JSONFile%#$q #$q%Path%#$q"
-If,Not,%^RET%,Equal,0,Halt,"JSONDelete Error: Failed to delete [%Path%] from [%JSONFile%]."
-
-System,EndLocal
-
-[#_PhoenixAPI_JSONPretty#]
-// ===============================================================================================================================
-// Name...........: JSONPretty
-// Description....: Experimental wrapper for jj - Format and indent the JSON file for easy human reading.
-// Syntax.........: JSONPretty,<JSONFile>
-// Parameters.....: JSONFile - Full path to the JSON filed to compact.
-// Return values..: 
-// Author.........: Homes32
-// Remarks........: https://github.com/tidwall/jj
-// Related........: Depends on %Tools%\%HostArch%\jj.exe
-// ===============================================================================================================================
-[_PhoenixAPI_JSONPretty]
-System,SetLocal
-GetParam,1,%JSONFile%
-
-If,Not,ExistFile,%JSONFile%,Halt,"JSONPretty Syntax Error: The file [%JSONFile%] does not exist."
-
-ShellExecute,Hide,"%Tools%\%HostArch%\jj.exe","-p -i #$q%JSONFile%#$q -o #$q%JSONFile%#$q"
-If,Not,%^RET%,Equal,0,Halt,"JSONPretty Error: Failed to pretty [%JSONFile%]."
-
-System,EndLocal
-
-[#_PhoenixAPI_JSONRead#]
-// ===============================================================================================================================
-// Name...........: JSONRead
-// Description....: Experimental wrapper for jj - Read an JSON value.
-// Syntax.........: JSONRead,<JSONFile>,<Path>
-// Parameters.....: JSONFile - Full path to the JSON filed to read.
-//                  Path - GJSON Path notation used to locate the value to read.
-//                  NOERR - Don't Halt on errors. (Use if you intend to handle errors yourself).
-// Return values..: %^RET% - Success - Returns the value of <Path>
-//                       Failure - Returns ""
-// Author.........: Homes32
-// Remarks........: jj.exe Homepage:  https://github.com/tidwall/jj
-//                  Path Syntax Help: https://github.com/tidwall/gjson/blob/master/SYNTAX.md
-//
-//                  Notes: We need to add escaped double-quotes surrounding the command with ^" or the FOR loop gets confused
-//                         and matches the quotes around "%Tools%\%HostArch%\jj.exe" incorrectly with the double-quotes in "%Path%".
-// Related........: Depends on %Tools%\%HostArch%\jj.exe
-// ===============================================================================================================================
-[_PhoenixAPI_JSONRead]
-System,SetLocal
-GetParam,1,%JSONFile%
-GetParam,2,%Path%
-GetParam,3,%Arg3%
-
-If,Not,ExistFile,%JSONFile%,Halt,"JSONRead Syntax Error: The file [%JSONFile%] does not exist."
-If,%Path%,Equal,"",Halt,"JSONRead Syntax Error: You must specify an JSON Path."
-
-If,%Arg3%,Equal,"NOERR",Set,%NOERR%,"True"
-
-FileDeleteEx,"%ProjectTemp%\PhoenixAPI-JSONRead.ini"
-
-ShellExecute,Hide,"cmd.exe","/c for /f #$qusebackq delims=#$q #$p? In (`^#$q#$q%Tools%\%HostArch%\jj.exe#$q -i #$q%JSONFile%#$q #$q%Path%#$q^#$q`) do (>#$q%ProjectTemp%\PhoenixAPI-JSONRead.ini#$q echo Value^=#$p?)"
-If,%^RET%,Equal,0,Begin
-  TXTAddLine,"%ProjectTemp%\PhoenixAPI-JSONRead.ini","[JSONRead]",PREPEND
-  IniRead,"%ProjectTemp%\PhoenixAPI-JSONRead.ini","JSONRead","Value",%Value%
-  Return,%Value%
-End
-Else,Begin
-  If,%NOERR%,Equal,"True",Return,""
-  Else,Halt,"JSONRead Error: Failed to read [%JSONFile%]."
-End
-
-System,EndLocal
-
-[#_PhoenixAPI_JSONWrite#]
-// ===============================================================================================================================
-// Name...........: JSONWrite
-// Description....: Experimental wrapper for jj - Set/Modify an JSON value.
-// Syntax.........: JSONWrite,<JSONFile>,<Path>,<Value>
-// Parameters.....: JSONFile - Full path to the JSON filed to edit.
-//                  Path - GJSON Path notation used to locate the value to write.
-//                  Value - The value to write. (Can be empty)
-// Return values..: 
-// Author.........: Homes32
-// Remarks........: jj.exe Homepage:  https://github.com/tidwall/jj
-//                  Path Syntax Help: https://github.com/tidwall/gjson/blob/master/SYNTAX.md
-// Related........: Depends on %Tools%\%HostArch%\jj.exe
-// ===============================================================================================================================
-[_PhoenixAPI_JSONWrite]
-System,SetLocal
-GetParam,1,%JSONFile%
-GetParam,2,%Path%
-GetParam,3,%Value%
-
-If,Not,ExistFile,%JSONFile%,Halt,"JSONWrite Syntax Error: The file [%JSONFile%] does not exist."
-If,%Path%,Equal,"",Halt,"JSONWrite Syntax Error: You must specify an JSON Path."
-
-ShellExecute,Hide,"%Tools%\%HostArch%\jj.exe","-v #$q%Value%#$q -i #$q%JSONFile%#$q -o #$q%JSONFile%#$q #$q%Path%#$q"
-If,Not,%^RET%,Equal,0,Halt,"JSONWrite Error: Failed to write the value of [%Value%] to [%Path%] in [%JSONFile%]."
-
-System,EndLocal
-
 [#_PhoenixAPI_MSIExtract#]
 // ===============================================================================================================================
 // Name...........: MSIExtract
@@ -2077,220 +1926,17 @@ System,SetLocal
 If,%^SIPARAM_1%,Equal,"",Halt,"WixExtract Syntax Error: You must specify the setup file."
 If,%^SIPARAM_2%,Equal,"",Halt,"WixExtract Syntax Error: You must specify the destination directory."
 
-Set,%WixExe%,"%Tools%\anycpu\wix\dark.exe"
-//Set,%WixExe%,"%Tools%\%HostArch%\wix\wix.exe"
+Set,%WixExe%,"%Tools%\x64\wix\wix.exe"
 
 GetParam,1,%SetupFile%
 Getparam,2,%DestDir%
 
 StrFormat,EndTrim,%DestDir%,"\","%DestDir%"
 
-ShellExecute,Hide,%WixExe%,"-x #$q%DestDir%#$q #$q%SetupFile%#$q"
-//ShellExecute,Hide,%WixExe%,"burn extract #$q%SetupFile%#$q -o #$q%DestDir%#$q -outba #$q%DestDir%\BootstrapperApp#$q"
+ShellExecute,Hide,%WixExe%,"burn extract #$q%SetupFile%#$q -o #$q%DestDir%#$q -outba #$q%DestDir%\BootstrapperApp#$q"
 If,Not,%ExitCode%,Equal,0,Begin
   FileVersion,%WixExe%,%WixVer%
   Halt,"WixExtract Error: Failed to unpack the setup file [%SetupFile%]. The command returned: [%ExitCode%]. You are using WixToolset version [%WixVer%]."
-End
-
-System,EndLocal
-
-[#_PhoenixAPI_XMLAdd#]
-// ===============================================================================================================================
-// Name...........: XMLAdd
-// Description....: Experimental wrapper for XmlStarlet - Add a new element/text/attribute to an XML file.
-// Syntax.........: XMLAdd,<Operation>,<XMLFile>,<XPath>,<Type>,<Name>[,<Value>]
-// Parameters.....: Operation - Can be one of:
-//                    Insert  - Insert a node at the the beginning of the XPath.
-//                    Append  - Append a node to the end of the XPath.
-//                    Subnode - Add a new subnode to each XPath in the document.
-//                  XMLFile - Full path to the .xml filed to edit.
-//                  XPath - XPath (XML Path Language) query used to insert the Attribute/Element.
-//                  Type - XPath type [elem|text|attr]
-//                  Name - Value Name
-//                  Value - (Optional) Value
-// Return values..: 
-// Author.........: Homes32
-// Remarks........: http://xmlstar.sourceforge.net/doc/UG/xmlstarlet-ug.pdf
-// Related........:
-// ===============================================================================================================================
-[_PhoenixAPI_XMLAdd]
-System,SetLocal
-GetParam,1,%Operation%
-GetParam,2,%XMLFile%
-GetParam,3,%XPath%
-GetParam,4,%Type%
-GetParam,5,%Name%
-GetParam,6,%Value%
-
-If,%Operation%,Equal,"",Halt,"XMLAdd Syntax Error: You must specify an operation [insert|append|subnode]."
-If,Not,ExistFile,%XMLFile%,Halt,"XMLAdd Syntax Error: The file [%XMLFile%] does not exist."
-If,%XPath%,Equal,"",Halt,"XMLAdd Syntax Error: You must specify an XPath."
-If,%Type%,Equal,"",Halt,"XMLAdd Syntax Error: You must specify a type [elem|text|attr]."
-If,%Name%,Equal,"",Halt,"XMLAdd Syntax Error: You must specify a name."
-
-If,%Operation%,Equal,"Insert",Begin
-  ShellExecute,Hide,"%Tools%\x86\xml.exe","edit --inplace --insert #$q%XPath%#$q --type #$q%Type%#$q --name #$q%Name%#$q --value #$q%Value%#$q #$q%XMLFile%#$q"
-  If,Not,%^RET%,Equal,0,Halt,"XMLAdd Error: Failed to insert value [%XPath%/%Name%: %Value%] to [%XMLFile%]."
-End
-Else,If,%Operation%,Equal,"Append",Begin
-  ShellExecute,Hide,"%Tools%\x86\xml.exe","edit --inplace --append #$q%XPath%#$q --type #$q%Type%#$q --name #$q%Name%#$q --value #$q%Value%#$q #$q%XMLFile%#$q"
-  If,Not,%^RET%,Equal,0,Halt,"XMLAdd Error: Failed to append value [%XPath%/%Name%: %Value%] to [%XMLFile%]."
-End
-Else,If,%Operation%,Equal,"Subnode",Begin
-  ShellExecute,Hide,"%Tools%\x86\xml.exe","edit --inplace --subnode #$q%XPath%#$q --type #$q%Type%#$q --name #$q%Name%#$q --value #$q%Value%#$q #$q%XMLFile%#$q"
-  If,Not,%^RET%,Equal,0,Halt,"XMLAdd Error: Failed to add subnode value [%XPath%/%Name%: %Value%] to [%XMLFile%]."
-End
-Else,Halt,"XMLAdd Syntax Error: You must specify an valid operation [insert|append|subnode]."
-
-System,EndLocal
-
-[#_PhoenixAPI_XMLDelete#]
-// ===============================================================================================================================
-// Name...........: XMLDelete
-// Description....: Experimental wrapper for XmlStarlet - Delete an XML path/value.
-// Syntax.........: XMLDelete,<XMLFile>,<XPath>
-// Parameters.....: XMLFile - Full path to the .xml filed to edit.
-//                  XPath - XPath (XML Path Language) query used to locate the Attribute/Element to delete.
-// Return values..: 
-// Author.........: Homes32
-// Remarks........: http://xmlstar.sourceforge.net/doc/UG/xmlstarlet-ug.pdf
-// Related........:
-// ===============================================================================================================================
-[_PhoenixAPI_XMLDelete]
-System,SetLocal
-GetParam,1,%XMLFile%
-GetParam,2,%XPath%
-
-If,Not,ExistFile,%XMLFile%,Halt,"XMLDelete Syntax Error: The file [%XMLFile%] does not exist."
-If,%XPath%,Equal,"",Halt,"XMLDelete Syntax Error: You must specify an XPath."
-
-ShellExecute,Hide,"%Tools%\x86\xml.exe","edit --inplace --delete #$q%XPath%#$q #$q%XMLFile%#$q"
-If,Not,%^RET%,Equal,0,Halt,"XMLDelete Error: Failed to delete [%XPath%] from [%XMLFile%]."
-
-System,EndLocal
-
-[#_PhoenixAPI_XMLRead#]
-// ===============================================================================================================================
-// Name...........: XMLRead
-// Description....: Experimental wrapper for XmlStarlet - Read a value from an XML file.
-// Syntax.........: XMLRename,<XMLFile>,<XPath>
-// Parameters.....: XMLFile - Full path to the .xml filed to edit.
-//                  XPath - XPath (XML Path Language) query used to locate the value to read.
-//                  NOERR - Don't Halt on errors. (Use if you intend to handle errors yourself).
-//                             eg. If check %^RET% to see if XMLRead fails and then call XMLAdd   
-// Return values..: %^RET% - Success - Returns the value of <XPath>
-//                           Failure - Returns ""
-// Author.........: Homes32
-// Remarks........: The current implementation of this function only returns a single value.
-//                  http://xmlstar.sourceforge.net/doc/UG/xmlstarlet-ug.pdf          
-//
-//                  Notes: We need to add escaped double-quotes surrounding the command with ^" or the FOR loop gets confused
-//                         and matches the quotes around "%Tools%\x86\xml.exe" incorrectly with the double-quotes in "%XMLFile%".
-// Related........:
-// ===============================================================================================================================
-[_PhoenixAPI_XMLRead]
-System,SetLocal
-GetParam,1,%XMLFile%
-GetParam,2,%XPath%
-GetParam,3,%Arg3%
-
-If,Not,ExistFile,%XMLFile%,Halt,"XMLRead Syntax Error: The file [%XMLFile%] does not exist."
-If,%Path%,Equal,"",Halt,"XMLRead Syntax Error: You must specify an XPath."
-
-If,%Arg3%,Equal,"NOERR",Set,%NOERR%,"True"
-
-FileDeleteEx,"%ProjectTemp%\PhoenixAPI-XMLRead.ini"
-
-ShellExecute,Hide,"cmd.exe","/c For /f #$qusebackq delims=#$q #$p? In (`^#$q#$q%Tools%\x86\xml.exe#$q select --text --template --value-of #$q%XPath%#$q #$q%XMLFile%#$q^#$q`) Do (>#$q%ProjectTemp%\PhoenixAPI-XMLRead.ini#$q echo Value^=#$p?)"
-If,%^RET%,Equal,0,Begin
-  TXTAddLine,"%ProjectTemp%\PhoenixAPI-XMLRead.ini","[XMLRead]",PREPEND
-  IniRead,"%ProjectTemp%\PhoenixAPI-XMLRead.ini","XMLRead","Value",%Value%
-  Return,%Value%
-End
-Else,Begin
-  If,%NOERR%,Equal,"True",Return,""
-  Else,Halt,"XMLRead Error: Failed to read [%XMLFile%]. XmlStarlet returned: [%^RET%]"
-End
-
-System,EndLocal
-
-[#_PhoenixAPI_XMLRename#]
-// ===============================================================================================================================
-// Name...........: XMLRename
-// Description....: Experimental wrapper for XmlStarlet - Rename a value in an XML file.
-// Syntax.........: XMLRename,<XMLFile>,<XPath>,<Value>
-// Parameters.....: XMLFile - Full path to the .xml filed to edit.
-//                  XPath - XPath (XML Path Language) query used to locate the Attribute/Element to rename.
-//                  Value - New Value
-// Return values..: 
-// Author.........: Homes32
-// Remarks........: The XPath must exist in order for the value to be Renamed.
-//                  http://xmlstar.sourceforge.net/doc/UG/xmlstarlet-ug.pdf
-// Related........:
-// ===============================================================================================================================
-[_PhoenixAPI_XMLRename]
-System,SetLocal
-GetParam,1,%XMLFile%
-GetParam,2,%XPath%
-GetParam,3,%Value%
-
-If,Not,ExistFile,%XMLFile%,Halt,"XMLRename Syntax Error: The file [%XMLFile%] does not exist."
-If,%XPath%,Equal,"",Halt,"XMLRename Syntax Error: You must specify an XPath."
-If,%Value%,Equal,"",Halt,"XMLRename Syntax Error: You must specify a value."
-
-ShellExecute,Hide,"%Tools%\x86\xml.exe","edit --inplace --rename #$q%XPath%#$q --value #$q%Value%#$q #$q%XMLFile%#$q"
-If,Not,%^RET%,Equal,0,Halt,"XMLRename Error: Failed to write value [%XPath%: %Value%] to [%XMLFile%]."
-
-System,EndLocal
-
-[#_PhoenixAPI_XMLUpdate#]
-// ===============================================================================================================================
-// Name...........: XMLUpdate
-// Description....: Update the value of an existing Attribute/Element
-// Syntax.........: XMLUpdate,<XMLFile>,<XPath>,<Value>,[NOERR]
-// Parameters.....: XMLFile - Full path to the .xml filed to edit.
-//                  XPath - XPath (XML Path Language) query used to locate the Attribute/Element to update.
-//                  Value - New Value
-//                  NOERR - Don't Halt on errors. (Use if you intend to handle errors yourself).
-//                          eg. If check %^RET% to see if XMLUpdate fails and then call XMLAdd        
-// Return values..: %^RET% - Returns: 0 - Success
-//                                1 - Failure
-//                                2 - Invalid Arguments
-//                                3 - Invalid XML File
-//                                4 - Library Exception
-//                                5 - Internal Error
-//                        -99999999 - XPath does not exist
-// Author.........: Homes32
-// Remarks........: The XPath must exist in order for the value to be updated.
-//                  http://xmlstar.sourceforge.net/doc/UG/xmlstarlet-ug.pdf
-// Related........:
-// ===============================================================================================================================
-[_PhoenixAPI_XMLUpdate]
-System,SetLocal
-GetParam,1,%XMLFile%
-GetParam,2,%XPath%
-GetParam,3,%Value%
-GetParam,4,%Arg3%
-
-If,Not,ExistFile,%XMLFile%,Halt,"XMLUpdate Syntax Error: The file [%XMLFile%] does not exist."
-If,%XPath%,Equal,"",Halt,"XMLUpdate Syntax Error: You must specify an XPath."
-If,%Value%,Equal,"",Halt,"XMLUpdate Syntax Error: You must specify a value."
-
-If,%Arg3%,Equal,"NOERR",Set,%NOERR%,"True"
-
-ShellExecute,Hide,"%Tools%\x86\xml.exe","select --text --template --value-of #$q%XPath%#$q #$q%XMLFile%#$q"
-If,Not,%^RET%,Equal,0,Begin
-  If,%NOERR%,Equal,"False",Halt,"XMLUpdate Error: Failed to query [%XPath%] from [%XMLFile%]. The XPath must exist in order for the value to be updated."
-  Return,-99999999
-End
-Else,Begin
-  ShellExecute,Hide,"%Tools%\x86\xml.exe","edit --inplace --update #$q%XPath%#$q --value #$q%Value%#$q #$q%XMLFile%#$q"
-  If,%^RET%,Equal,0,Return,0
-  Else,Begin
-    // There was a problem writing the XML file
-    If,%NOERR%,Equal,True,Return,5
-    Else,Halt,"XMLUpdate Error: Failed to write value [%XPath%: %Value%] to [%XMLFile%]."
-  End
 End
 
 System,EndLocal
