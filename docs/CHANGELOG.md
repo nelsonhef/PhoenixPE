@@ -2,6 +2,104 @@
 
 Notable changes to the PhoenixPE project.
 
+## Release UNRELEASED
+
+IMPORTANT: [See here](#ScriptBreakingChanges-2026-07-15) for recent script-breaking changes.
+
+### Added
+- .Net 10 runtime
+- BeyondCompare v5.2.4.32425
+- Added HDD Low Level Format v5.60
+- Added HDD Raw copy v2.6
+
+### Changed
+- Include additional module dependencies in WindowsPowerShell.script
+- Implemented a workaround for crappy iVentoy hooks that mess with the working directory and crash the PhoenixPE loader. (Issue #179)
+- Merged AcctPicExtractor functionality into ImgageConvert (Phoenix-API > ConvertImage)
+- Moved ventoy detection into the PhoenixPE loader to get rid of incompetent antivirus false-positives.
+- Migrated from buggy #1,#a,#c,#r section parameters to PEBakery variable based parameters (%^RET%, %^SIPARAM_n%, %^SIPARAM_COUNT%, etc.).
+- Disable automatic ReFS Volume Upgrades (prevents the volume appearing as RAW or inaccessible if PhoenixPE was built with a newer source then the original host OS supports.
+- Innounp updated to v2.70.1
+- WixToolkit updated to v8.0.6
+- Update .NET runtime scripts for new WixToolkit.
+- Update Haslo Data Recovery URLs.
+- lessmsi tools updated to v2.12.9
+- Optimized build engine for 70% faster builds!
+- Implemented parallel processing for first time registry ACL operations (85% faster!).
+- Migrated to built-in PEBakery XML & JSON file handling commands.
+- Enhanced build log.
+
+- .Net 8 runtime updated to v8.0.29
+- .Net 9 runtime updated to v9.0.18
+- 7-Zip script and tools updated to v26.02
+- AgentRansack updated to v2022 build 3562
+- AIDA64 updated to v8.30.8300
+- Arsenal Image Mounter updated. (Driver v1.2.29.95 / GUI v3.12.344.0)
+- BleachBit updated to v6.0.2
+- CPU-Z updated to v.2.20.2
+- DesktopInfo updated to v3.22.0
+- DiskCyptor updated to v2.0.1
+- DiskGenius updated to v6.2.0.1829
+- DriverStoreExplorer updated to v1.0.26
+- FastStone Image Viewer updated to v8.5
+- Google Chrome updated to v150.0.7871.187
+- GPU-Z updated to v2.70.0
+- HWinfo updated to v8.48
+- ImDisk updated to v2.1.2
+- Intel MEI Driver updated to v2618.9.30.0
+- IrfanView updated to v4.75
+- KeePass Password Safe updated to v2.61.1
+- LibreOffice updated to v26.2.4
+- MPC-BE updated to v1.9.0.0
+- Notepad++ updated to v8.9.7.0
+- Notepad3 updated to v7.26.602.1
+- NVDA updated to v2026.1.1
+- OpenShell updated to v4.4.198
+- PowerShell Core updated to v7.6.3
+- Rufus updated to v4.15
+- RustDesk updated to v1.4.8
+- SumatraPDF updated to v3.6.1
+- TotalCommander updated to v11.58
+- Ventoy updated to v1.1.17
+- VeraCrypt updated to v1.26.29 - Now downloads directly from SourceForge.
+- WinMerge updated to v2.16.56.2
+- WinRAR updated to v7.23
+- Zulu JRE11 updated to v11.90.19
+- Zulu JRE17 updated to v17.68.17
+- Zulu JRE21 updated to v21.52.15
+- Zulu JRE25 updated to v25.36.15
+
+### Fixed
+- Fixed audio in Win11 26H1+
+
+### Removed
+- PhoenixAPI experimental JSON commands have been removed. JSONRead, JSONWrite, JSONDelete and been re-written for native support in PEBakery. **This is a script breaking change**.
+- PhoenixAPI experimental JSONPretty and JSONCompact commands have been removed. Native support for Pretty/Compact JSON files was added via the new `JSONFormat` command.
+- PhoenixAPI experimental XML commands have been removed. XMLRead, XMLAdd, XMLUpdate, XMLRename, XMLDelete have been re-written for native support in PEBakery. **This is a script breaking change**.
+- Migrated from buggy and dangerous #1,#a,#c,#r section parameters to PEBakery variable based parameters (%^RET%, %^SIPARAM_n%, %^SIPARAM_COUNT%, etc.). Any previous token usage, ie. `#r` or `#1` will need to be converted to `%^RET%`, `%^SIPARAM_1%`, etc.
+
+### Script Breaking Changes {ScriptBreakingChanges-2026-07-15}
+
+This section contains a list of all changes made in recent updates that will almost certainly break existing scripts. Please read this list carefully when upgrading. If any of these issues affect you then you will need to modify your scripts.
+
+- `JSONRead` now returns a value via `%DestVar%` instead of `#r`. Then syntax remains the same except for the addition of the `DestVar` parameter.
+
+  Old Syntax: `JSONRead,<JSONFile>,<Path>[,NOERR]`
+  
+  New Syntax: `JSONRead,<JSONFile>,<Path>,<%DestVar%>[,NOERR]`
+
+
+- `XMLRead` now returns a value via `%DestVar%` instead of `#r`. Then syntax remains the same except for the addition of the `DestVar` parameter.
+
+  Old Syntax: `XMLRead,<XMLFile>,<XPath>[,NOERR]`
+  
+  New Syntax: `XMLRead,<XMLFile>,<XPath>,<%DestVar%>[,NOERR]`
+
+- `XMLUpdate` now returns an `ExitCode%` of `2` instead of an `%ExitCode%` of `-99999999` if the path/value does not exist.
+
+- Migrated from buggy #1,#a,#c,#r section parameters to PEBakery variable based parameters (%^RET%, %^SIPARAM_n%, %^SIPARAM_COUNT%, etc.).
+  Legacy section parameters have been disabled. You must update your scripts to use new variable based parameters in place of the old winbuilder style parameters. (eg. `#r` -> `%^RET%`)
+
 ## Release 2026-04-16
 
 ## Added
