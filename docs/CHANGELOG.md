@@ -2,9 +2,13 @@
 
 Notable changes to the PhoenixPE project.
 
-## Release UNRELEASED
+## Release 2026-07-25
 
 IMPORTANT: [See here](#ScriptBreakingChanges-2026-07-15) for recent script-breaking changes.
+
+As of this release PhoenixPE will only officially support building from an x64 host. 
+
+Note that you can still build an x86 PhoenixPE using an x86 Windows ISO, you just need to do it from a x64 host.
 
 ### Added
 - .Net 10 runtime
@@ -20,7 +24,7 @@ IMPORTANT: [See here](#ScriptBreakingChanges-2026-07-15) for recent script-break
 - Migrated from buggy #1,#a,#c,#r section parameters to PEBakery variable based parameters (%^RET%, %^SIPARAM_n%, %^SIPARAM_COUNT%, etc.).
 - Disable automatic ReFS Volume Upgrades (prevents the volume appearing as RAW or inaccessible if PhoenixPE was built with a newer source then the original host OS supports.
 - Innounp updated to v2.70.1
-- WixToolkit updated to v8.0.6
+- WixToolkit updated to v8.0.6 (Self-Contained build)
 - Update .NET runtime scripts for new WixToolkit.
 - Update Haslo Data Recovery URLs.
 - lessmsi tools updated to v2.12.9
@@ -28,7 +32,7 @@ IMPORTANT: [See here](#ScriptBreakingChanges-2026-07-15) for recent script-break
 - Implemented parallel processing for first time registry ACL operations (85% faster!).
 - Migrated to built-in PEBakery XML & JSON file handling commands.
 - Enhanced build log.
-
+- PEBakery build engine updated from .net8 to .net10.
 - .Net 8 runtime updated to v8.0.29
 - .Net 9 runtime updated to v9.0.18
 - 7-Zip script and tools updated to v26.02
