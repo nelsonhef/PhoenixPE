@@ -33,15 +33,15 @@ Title=7-Zip
 Author=Homes32
 Level=5
 Version=1.2.6.0
-Description=(v25.01) 7-Zip is a free and open-source file archiver capable of reading and writing many archive formats.
-Date=2024-08-14
+Description=(v26.02) 7-Zip is a free and open-source file archiver capable of reading and writing many archive formats.
+Date=2026-08-08
 Selected=True
 Mandatory=False
 
 [Variables]
 %ProgramFolder%="7-Zip"
 %ProgramExe%="7zFM.exe"
-%ProgramVersion%=2501
+%ProgramVersion%=2602
 %DownloadURL86%=https://www.7-zip.org/a/7z%ProgramVersion%.exe
 %DownloadURL64%=https://www.7-zip.org/a/7z%ProgramVersion%-x64.exe
 
